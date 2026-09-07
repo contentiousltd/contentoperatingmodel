@@ -1,0 +1,25 @@
+/* ================================================================
+   The design system, then this site's own CSS.
+
+   Import order is not a preference: layers.css declares the cascade
+   order (tokens → theme → base → components → utilities) and every file
+   after it lands in its declared layer. semantic.css and products.css
+   are doors into skills/contentious-design/tokens/ and must come in that
+   order, because products.css re-points a subset of the same tokens
+   under [data-product] at identical specificity, so source order decides.
+
+   <html data-product="com"> is the whole theming integration. Without
+   it every token falls back to Content Health Check's, which is the bug
+   the product-signature layer exists to prevent.
+   ================================================================ */
+
+@import "@contentious/ui/styles/layers.css";
+@import "@contentious/ui/styles/tokens.css";
+@import "@contentious/ui/styles/base.css";
+@import "@contentious/ui/styles/themes/content-operating-model.css";
+@import "@contentious/ui/styles/semantic.css";
+@import "@contentious/ui/styles/products.css";
+@import "@contentious/ui/styles/typography.css";
+@import "@contentious/ui/styles/components.css";
+
+@import "./site.css";

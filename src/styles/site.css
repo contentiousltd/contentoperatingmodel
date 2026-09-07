@@ -1,0 +1,45 @@
+/* ================================================================
+   Page CSS for contentoperatingmodel.com.
+
+   Tokens only: no hex, no palette copies, no invented values. Anything
+   this file needs that the design system does not answer is a GAPS.md
+   entry in contentious-ui, not a value decided here. Enforced by
+   npm run check:tokens.
+
+   Component styling comes from the design system's c-* classes. What
+   belongs here is page-specific layout and the two pieces the COM
+   reference page builds from plain markup rather than components: the
+   three-layer stack and the 7x2 grid.
+   ================================================================ */
+
+@layer components {
+  /* The nav is app chrome doing marketing duty, and .c-topbar is nowrap
+     because it was drawn at the app's 19px. At the front door's 24px the
+     brand plus links plus a button overflow a narrow viewport, so it wraps
+     here. The design round records this as needing a marketing nav variant;
+     this is the same patch its own specimen page carries, and it goes when
+     that variant lands. */
+  .c-topbar {
+    flex-wrap: wrap;
+    row-gap: calc(var(--u) * 0.5);
+  }
+
+  .site-main {
+    display: block;
+  }
+
+  /* Skip link: visible only when focused. */
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 100;
+    padding: calc(var(--u) * 0.5) var(--u);
+    background-color: var(--surface-card);
+    color: var(--text-strong);
+  }
+
+  .skip-link:focus {
+    left: 0;
+  }
+}

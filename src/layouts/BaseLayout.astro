@@ -1,0 +1,80 @@
+---
+import '../styles/index.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { buildJsonLd } from '../lib/structured-data';
+
+interface Props {
+  title: string;
+  /** Overrides the full <title>; otherwise "<title> | Content Operating Model". */
+  metaTitle?: string;
+  description: string;
+  /** Extra JSON-LD nodes for this page, merged with Organization and WebSite. */
+  jsonLd?: Record<string, unknown>[];
+  noindex?: boolean;
+  /** Path of this page's Markdown twin, e.g. /framework.md. */
+  markdownTwin?: string;
+}
+
+const { title, metaTitle, description, jsonLd = [], noindex, markdownTwin } = Astro.props;
+
+const pageTitle = metaTitle ?? `${title} | Content Operating Model`;
+
+// 'file' build format puts .html in Astro.url.pathname; the canonical URL is
+// slash-free and extension-free, and the edge function makes the served URL
+// match it. See astro.config.mjs.
+const stripHtml = (p: string) => (p.endsWith('.html') ? p.slice(0, -'.html'.length) : p);
+const stripSlash = (p: string) => (p.length > 1 && p.endsWith('/') ? p.slice(0, -1) : p);
+const canonicalPath = stripSlash(stripHtml(Astro.url.pathname)) || '/';
+const canonicalUrl = new URL(canonicalPath, Astro.site).href;
+const ogImage = new URL('/images/og-default.png', Astro.site).href;
+
+const structuredData = buildJsonLd(Astro.site?.href ?? 'https://contentoperatingmodel.com/', jsonLd);
+---
+
+<!doctype html>
+<html lang="en-GB" data-product="com">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{pageTitle}</title>
+  <meta name="description" content={description} />
+  {noindex && <meta name="robots" content="noindex" />}
+  <link rel="canonical" href={canonicalUrl} />
+
+  {/* The machine door: every page's Markdown twin is discoverable from the
+      page itself, not only from llms.txt. See ADR-COM-0004. */}
+  {markdownTwin && (
+    <link rel="alternate" type="text/markdown" href={new URL(markdownTwin, Astro.site).href} />
+  )}
+
+  <meta property="og:title" content={pageTitle} />
+  <meta property="og:description" content={description} />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content={canonicalUrl} />
+  <meta property="og:image" content={ogImage} />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={pageTitle} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={ogImage} />
+
+  <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" href="/images/favicon-32.png" sizes="32x32" />
+  <link rel="apple-touch-icon" href="/images/apple-touch-icon.png" />
+
+  <link rel="preload" href="/fonts/BelyDisplay-Regular.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/fonts/Bely-Regular.woff2" as="font" type="font/woff2" crossorigin />
+
+  <link rel="alternate" type="application/rss+xml" title="Content Operating Model releases" href="/rss.xml" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <Header />
+  <main id="main" class="site-main">
+    <slot />
+  </main>
+  <Footer />
+</body>
+</html>

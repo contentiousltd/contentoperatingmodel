@@ -1,0 +1,52 @@
+name: Checks
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Lint, build and validate
+    runs-on: ubuntu-latest
+    env:
+      # Em dashes fail the build; the heuristic prose rules stay advisory.
+      STRICT_PROSE_RULES: em-dash
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # sitemap-lastmod.mjs reads each page's last commit date, which a
+          # depth-1 clone does not have. Without this every lastmod is omitted
+          # and the sitemap silently loses the field.
+          fetch-depth: 0
+          # persist-credentials: false stops actions/checkout writing an
+          # AUTHORIZATION header for github.com into git config. If
+          # @contentious/ui ever goes private, that header would override the
+          # credentials a private-packages step configures. These jobs never
+          # push, so they do not need it.
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      # Type-check, prose and tokens. check:tokens is the local stand-in for the
+      # token-copy detector suite ADR-0011 §5 promises the package will ship.
+      - run: npm run lint
+
+      # The design system is pinned by exact tag (suite ADR-0014 §2). A
+      # consumer may be deliberately behind, never silently behind.
+      - run: npm run check:ui-current
+
+      # Build runs the postbuild validator: every page needs a description, a
+      # canonical, JSON-LD, a Markdown twin and no trailing-slash internal
+      # links, and llms.txt, the sitemap, robots.txt and the feed must exist.
+      - run: npm run build

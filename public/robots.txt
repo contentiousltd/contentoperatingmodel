@@ -1,0 +1,7 @@
+# AI crawlers are welcome. The framework is meant to be read, cited and
+# followed, by people and by machines: see /llms.txt for the map and the
+# Markdown renderings of every page.
+User-agent: *
+Allow: /
+
+Sitemap: https://contentoperatingmodel.com/sitemap-index.xml

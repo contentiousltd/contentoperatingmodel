@@ -1,0 +1,38 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { FRAMEWORK_VERSION } from '../data/framework';
+
+const releases = (await getCollection('releases')).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+);
+---
+<BaseLayout
+  title="Changelog"
+  description={`Every change to the Content Operating Model framework, release by release. Currently at version ${FRAMEWORK_VERSION}.`}
+  markdownTwin="/changelog.md"
+>
+  <section class="c-marketing c-marketing-section">
+    <div class="c-section__inner">
+      <p class="c-eyebrow">The framework</p>
+      <h1 class="display-heading type-h1">Changelog</h1>
+      <p class="type-intro">
+        A call that fails becomes a rule in the next version. This is where that
+        is recorded, release by release.
+      </p>
+      {releases.map((release) => (
+        <article>
+          <h2 class="display-heading" id={`v${release.data.version}`}>
+            Version {release.data.version}
+            <span class="type-sm">
+              <time datetime={release.data.date.toISOString()}>
+                {release.data.date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+              </time>
+            </span>
+          </h2>
+          <p>{release.data.summary}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

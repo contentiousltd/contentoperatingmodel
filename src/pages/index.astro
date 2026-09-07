@@ -1,0 +1,55 @@
+---
+import { getEntry, render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { LAYERS, QUESTIONS, FRAMEWORK_VERSION } from '../data/framework';
+
+const home = await getEntry('pages', 'home');
+if (!home) throw new Error('src/content/pages/home.md is missing');
+const { Content } = await render(home);
+---
+<BaseLayout
+  title={home.data.title}
+  metaTitle={home.data.metaTitle}
+  description={home.data.description}
+  markdownTwin="/index.md"
+>
+  <section class="c-marketing c-marketing-section">
+    <div class="c-section__inner">
+      <p class="c-eyebrow">An open framework from Contentious</p>
+      <h1 class="c-hero__heading display-heading type-h1">Content operating models are the answer</h1>
+      <p class="c-hero__intro type-intro">
+        A content operating model is the harness for your content function: the
+        work people do, the work agents do, and the handoffs between them, written
+        down so that both can follow it.
+      </p>
+      <p>
+        <a class="c-button" href="/framework">Read the framework</a>
+      </p>
+    </div>
+  </section>
+
+  <hr class="c-divider c-divider--taper" />
+
+  <section class="c-marketing c-marketing-section prose">
+    <div class="c-section__inner">
+      <Content />
+    </div>
+  </section>
+
+  <section class="c-marketing c-marketing-section c-marketing-section--tint">
+    <div class="c-section__inner">
+      <p class="c-eyebrow">The shape of it</p>
+      <h2 class="display-heading type-h2">Three layers, and seven questions on top</h2>
+      <ul class="c-bullets c-bullets--accent">
+        {LAYERS.map((layer) => (
+          <li><strong>{layer.name}.</strong> {layer.summary}</li>
+        ))}
+      </ul>
+      <p>
+        The content layer answers seven questions: {QUESTIONS.map((q) => q.name.replace('?', '')).join(', ').toLowerCase()}.
+        Each one twice, as a rule and as a call.
+        <a href="/framework">The framework page</a> specifies all of it, at version {FRAMEWORK_VERSION}.
+      </p>
+    </div>
+  </section>
+</BaseLayout>

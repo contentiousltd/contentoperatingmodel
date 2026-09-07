@@ -1,0 +1,174 @@
+---
+import { getEntry, render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { LAYERS, QUESTIONS, CELLS, VOCABULARY, FRAMEWORK_VERSION } from '../data/framework';
+
+const entry = await getEntry('framework', 'framework');
+if (!entry) throw new Error('src/content/framework/framework.md is missing');
+const { Content } = await render(entry);
+
+// The vocabulary as a DefinedTermSet: what makes the framework's terms citable
+// as terms rather than as prose. See ADR-COM-0004.
+const site = Astro.site?.href.replace(/\/$/, '') ?? 'https://contentoperatingmodel.com';
+const jsonLd = [
+  {
+    '@type': 'DefinedTermSet',
+    '@id': `${site}/framework#vocabulary`,
+    name: 'Content Operating Model vocabulary',
+    version: FRAMEWORK_VERSION,
+    hasDefinedTerm: VOCABULARY.filter((term) => !term.rejected).map((term) => ({
+      '@type': 'DefinedTerm',
+      name: term.term,
+      description: term.definition,
+      inDefinedTermSet: `${site}/framework#vocabulary`,
+    })),
+  },
+];
+---
+<BaseLayout
+  title={entry.data.title}
+  metaTitle={entry.data.metaTitle}
+  description={entry.data.description}
+  jsonLd={jsonLd}
+  markdownTwin="/framework.md"
+>
+  <article class="c-marketing">
+    <section class="c-marketing-section">
+      <div class="c-section__inner">
+        <p class="c-eyebrow">The framework</p>
+        <h1 class="display-heading type-h1">{entry.data.title}</h1>
+        <p class="type-intro">
+          Version {FRAMEWORK_VERSION} · September 2026 · an open framework from
+          Contentious, being tested with real organisations before 1.0.
+        </p>
+      </div>
+    </section>
+
+    <section class="c-marketing-section prose">
+      <div class="c-section__inner"><Content /></div>
+    </section>
+
+    <section class="c-marketing-section c-marketing-section--tint">
+      <div class="c-section__inner">
+        <p class="c-eyebrow">The structure</p>
+        <h2 id="the-three-layers" class="display-heading type-h2">The three layers</h2>
+        <p>The model describes three layers of organisational material, stacked.</p>
+        <div class="stack">
+          {LAYERS.map((layer) => (
+            <div class={`layer${layer.foundation ? '' : ' layer--top'}`}>
+              <p class="c-eyebrow">{layer.foundation ? 'Foundation' : 'The working machinery'}</p>
+              <h3 id={layer.id}>{layer.name}</h3>
+              <p>{layer.summary}</p>
+            </div>
+          ))}
+        </div>
+        <p>
+          Content is the only layer the audience sees, which is why organisations
+          over-invest in it and under-invest beneath it. Most content problems
+          that look like writing problems are layer problems: the words are fine,
+          and there is nothing under them.
+        </p>
+      </div>
+    </section>
+
+    <section class="c-marketing-section">
+      <div class="c-section__inner">
+        <p class="c-eyebrow">The content layer</p>
+        <h2 id="the-seven-questions" class="display-heading type-h2">The seven questions</h2>
+        <p>
+          A working model answers seven questions about how the layers become
+          published content. Why sits at the centre, and the other six connect to
+          it, because none of them can be answered well until it is.
+        </p>
+        <dl>
+          {QUESTIONS.map((question) => (
+            <div id={question.id}>
+              <dt class="display-heading">{question.name} <span class="type-sm">{question.subtitle}</span></dt>
+              <dd>{question.summary}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </section>
+
+    <section class="c-marketing-section c-marketing-section--tint">
+      <div class="c-section__inner">
+        <p class="c-eyebrow">Two registers</p>
+        <h2 id="rule-and-call" class="display-heading type-h2">Every question is answered twice</h2>
+        <p>
+          A strategy sets the rule once; an operating model makes the call every
+          time. Rules without calls give you the beautiful strategy deck and the
+          chaotic Tuesdays. Calls without rules give you the opposite
+          organisation: the smooth machine whose workflow hums and whose content
+          nobody can explain the point of.
+        </p>
+        <p>
+          AI makes this split impossible to ignore, because AI only accelerates
+          one side of it. Ask an agent to draft forty pages and it will make
+          hundreds of calls before lunch. What it cannot do is supply the rules it
+          is making them against.
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Question</th>
+              <th scope="col">The rule, set once</th>
+              <th scope="col">The call, made every time</th>
+            </tr>
+          </thead>
+          <tbody>
+            {QUESTIONS.map((question) => (
+              <tr>
+                <th scope="row">{question.name}</th>
+                <td>{question.rule}</td>
+                <td>{question.call}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p class="type-sm">
+          Crossing the seven questions with the two registers gives the model its
+          working surface: {CELLS.length} cells, each of them concrete, each
+          auditable. The 1.0 toolkit will provide templates for all of them.
+        </p>
+      </div>
+    </section>
+
+    <section class="c-marketing-section">
+      <div class="c-section__inner">
+        <p class="c-eyebrow">Vocabulary</p>
+        <h2 id="vocabulary" class="display-heading type-h2">The words, and what they mean</h2>
+        <dl>
+          {VOCABULARY.filter((term) => !term.rejected).map((term) => (
+            <div>
+              <dt class="display-heading">{term.term}</dt>
+              <dd>{term.definition}</dd>
+            </div>
+          ))}
+        </dl>
+        <h3 id="terms-not-used">Terms deliberately not used</h3>
+        <dl>
+          {VOCABULARY.filter((term) => term.rejected).map((term) => (
+            <div>
+              <dt class="display-heading">{term.term}</dt>
+              <dd>{term.definition}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </section>
+
+    <section class="c-marketing-section c-marketing-section--tint">
+      <div class="c-section__inner">
+        <p class="c-eyebrow">Versioning</p>
+        <h2 id="version" class="display-heading type-h2">Version {FRAMEWORK_VERSION}, and what happens next</h2>
+        <p>
+          This page carries a version number because the framework practises what
+          it preaches. Changes are logged, release by release, in
+          <a href="/changelog">the changelog</a>, and nothing gets called
+          canonical until teams that do not work for us have used it.
+        </p>
+      </div>
+    </section>
+  </article>
+</BaseLayout>

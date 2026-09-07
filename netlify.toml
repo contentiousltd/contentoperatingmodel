@@ -1,0 +1,27 @@
+# Netlify configuration for contentoperatingmodel.com.
+#
+# Astro owns trailing-slash behaviour: trailingSlash: 'never' plus
+# build.format: 'file' emits /framework.html, served at /framework, with the
+# slashed form 301'd by the edge function. Netlify's "Pretty URLs" setting does
+# the opposite and makes the two layers fight, so it is pinned off here.
+#
+# ADR-COM-0002 keeps a named list of everything Netlify-specific in this repo,
+# so the move to Railway stays a checklist rather than an excavation. This file,
+# the edge function and deploy previews are that list. There are deliberately
+# no Netlify Functions and no Netlify Forms.
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+  # Skip the build when a push only touched documentation. Exit 0 cancels the
+  # build; any other code proceeds, so an unset CACHED_COMMIT_REF (the first
+  # build) errors and safely builds anyway. Listed by path rather than as a
+  # blanket *.md, because src/content is markdown that IS build input.
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- . ':(exclude)docs' ':(exclude).claude' ':(exclude)README.md' ':(exclude)CHANGELOG.md' ':(exclude)CLAUDE.md'"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[build.processing.html]
+  pretty_urls = false

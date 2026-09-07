@@ -1,0 +1,22 @@
+---
+// .c-topbar is the design system's chrome component. It is app chrome doing
+// marketing duty here, which is what every other site in the suite does and
+// what the COM reference page records as needing a marketing variant.
+const links = [
+  { href: '/framework', label: 'The framework' },
+  { href: '/toolkit', label: 'The toolkit' },
+  { href: '/changelog', label: 'Changelog' },
+];
+const path = Astro.url.pathname.replace(/\.html$/, '').replace(/\/$/, '') || '/';
+---
+<header class="c-topbar">
+  <a class="c-topbar__brand display-heading" href="/">
+    <img src="/images/com-apparatus.png" alt="" width="40" height="40" />
+    <span>Content Operating Model</span>
+  </a>
+  <nav class="c-topbar__right" aria-label="Main">
+    {links.map((link) => (
+      <a href={link.href} aria-current={path === link.href ? 'page' : undefined}>{link.label}</a>
+    ))}
+  </nav>
+</header>
