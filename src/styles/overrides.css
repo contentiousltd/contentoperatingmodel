@@ -68,6 +68,14 @@
   margin: 0 0 calc(var(--u) * 0.33);
 }
 
+/* ledger 26: and .prose h2's 1.5em top margin, the prose rhythm for a
+   heading after text, would open an 86px gap between an eyebrow and the
+   heading it labels. The eyebrow's own margin is the gap. */
+.prose .c-eyebrow + h2,
+.prose .c-eyebrow + h3 {
+  margin-top: 0;
+}
+
 /* ledger 16: font smoothing, as the COM reference page's own body rule and
    contentious.ltd. Without it macOS renders Bely with subpixel smoothing and
    the text reads a weight heavier than the studio site's. */

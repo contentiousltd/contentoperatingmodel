@@ -81,6 +81,25 @@ const htmlH2s = (html) =>
 /** h2 texts of a Markdown twin. */
 const mdH2s = (md) => [...md.matchAll(/^## (.+)$/gm)].map((m) => decode(m[1]));
 
+// Two content files with one stem (home.md left beside home.mdx by a stale
+// editor buffer) give a collection two entries with one id, and whichever
+// loads last silently wins. Every content directory must have one file per
+// stem.
+for (const dir of ['src/content/pages', 'src/content/framework', 'src/content/releases', 'src/content/components']) {
+  let names = [];
+  try {
+    names = (await readdir(dir)).filter((n) => /\.(md|mdx)$/.test(n));
+  } catch {
+    continue;
+  }
+  const stems = new Map();
+  for (const name of names) {
+    const stem = name.replace(/\.(md|mdx)$/, '');
+    if (stems.has(stem)) fail(`${dir}: ${stems.get(stem)} and ${name} share the id "${stem}"; one of them is stale`);
+    stems.set(stem, name);
+  }
+}
+
 const pages = await listHtml(DIST);
 if (pages.length === 0) fail('no HTML in dist/ — did the build run?');
 

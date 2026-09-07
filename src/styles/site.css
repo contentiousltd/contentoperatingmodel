@@ -30,14 +30,21 @@
 
   /* A decorative figure in the prose floats right of the heading that
      follows it, and the copy wraps beside it. Its top margin sits the figure
-     level with the heading's top rather than above it. Below the chrome
-     breakpoint it is a centred block. The wide-width breakout is ledger 24
-     in overrides.css. */
+     level with the heading's top rather than above it (2.6u: the heading's
+     own 1.5em top margin, less the paragraph margin the figure already sits
+     under; measured level at 1440 and 2192px). Below the chrome breakpoint it
+     is a centred block. The wide-width breakout is ledger 24 in
+     overrides.css. */
   .prose-figure {
     float: right;
     width: 36%;
     height: auto;
     margin: calc(var(--u) * 2.6) 0 var(--u) calc(var(--u) * 1.5);
+  }
+
+  /* The prose column contains its own float. */
+  .prose .c-section__inner {
+    display: flow-root;
   }
 
   @media (width < 48rem) {

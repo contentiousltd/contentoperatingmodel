@@ -4,11 +4,12 @@
 // llms.txt and the header.
 import { Image } from 'astro:assets';
 import { FAMILY, NAV, PUBLISHER, SITE_NAME } from '@/config/site';
-// The pale cut of the apparatus for the dark ground, as Content Health Check
-// ships clipboard-pale for the same reason; the header keeps the full one. The
-// package's brand set has no pale cut yet (docs/optimisations-2026-09-07.md
-// §7.8), so this one is local. The mark renders at 4.8u, 96 to 116px.
-import apparatus from '@/assets/apparatus-pale.png';
+// The pale cut of the apparatus, sapling colourway, for the dark ground, as
+// Content Health Check ships clipboard-pale for the same reason; the header
+// keeps the full one. The package's brand set has no pale cut yet
+// (docs/optimisations-2026-09-07.md §7.8), so this one is local. The mark
+// renders at 4.8u, 96 to 116px.
+import apparatus from '@/assets/apparatus-sapling-pale.png';
 const year = new Date().getFullYear();
 ---
 <footer class="c-marketing c-footer" data-surface="inverse">
@@ -24,19 +25,20 @@ const year = new Date().getFullYear();
       </div>
     </div>
     <div class="c-footer__groups">
+          <nav class="c-footer__group" aria-label="This site">
+        <h4>Here</h4>
+        <div class="c-footer__links">
+          {NAV.map((link) => <a href={link.href}>{link.label}</a>)}
+          <a href="/llms.txt">llms.txt</a>
+        </div>
+      </nav>
       <nav class="c-footer__group" aria-label="Contentious products">
         <h4>Elsewhere</h4>
         <div class="c-footer__links">
           {FAMILY.map((site) => <a href={site.href}>{site.label}</a>)}
         </div>
       </nav>
-      <nav class="c-footer__group" aria-label="This site">
-        <h4>This site</h4>
-        <div class="c-footer__links">
-          {NAV.map((link) => <a href={link.href}>{link.label}</a>)}
-          <a href="/llms.txt">llms.txt</a>
-        </div>
-      </nav>
+
     </div>
   </div>
   {/* A div, not a p, as in the reference page: .c-footer p sets margin and a

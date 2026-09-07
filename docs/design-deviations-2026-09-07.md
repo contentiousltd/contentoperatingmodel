@@ -358,7 +358,9 @@ and closing its items is ROAD-1368 (Next). The policy is
     `.c-marketing-section { font-size: var(--t-body) }`, and, because the
     package's `.prose` sets the unscaled base on the block and scales only
     `p` and `li`, unlayered restatements of `.prose`, `.prose p`, `.prose li`
-    and `.prose .c-eyebrow` on the roles. After: 24 / 22 / 20px body copy on
+    and `.prose .c-eyebrow` on the roles, and `.prose .c-eyebrow + h2` with
+    no top margin (the package's `.prose h2` 1.5em opened an 86px gap between
+    an eyebrow and the heading it labels). After: 24 / 22 / 18px body copy on
     every page and element at wide / laptop / phone.
     **Fix in the system:** `body` derives from the density tokens
     (`--t-body`, or `--u`), and `.prose` stops needing its own anchor.

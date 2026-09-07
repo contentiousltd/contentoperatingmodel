@@ -4,10 +4,12 @@
 // what the COM reference page records as needing a marketing variant
 // (docs/design-deviations-2026-09-07.md item 25).
 import { Image } from 'astro:assets';
-// The product mark from the package's brand set, not a local copy: 320px, so
-// the 40px mark has its 2× rendition. layout="fixed" gives the element its
-// real 40×40 intrinsic size and a 1×/2× srcset.
-import mark from '@contentious/ui/brand/content-operating-model/logo@2x.png';
+// The apparatus in the sapling colourway, Julius's cut of 8 September 2026.
+// The package's brand set still carries the earlier colourway
+// (docs/optimisations-2026-09-07.md §7.8 asks for this one), so the mark is
+// local until it does. layout="fixed" gives the element its real 40×40
+// intrinsic size and a 1×/2× srcset.
+import mark from '@/assets/apparatus-sapling.png';
 import { NAV, SITE_NAME } from '@/config/site';
 import { canonicalPath } from '@/lib/urls';
 

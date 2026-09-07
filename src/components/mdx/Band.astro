@@ -10,6 +10,6 @@ interface Props {
 }
 const { tint = false } = Astro.props;
 ---
-<section class:list={['c-marketing-section', 'prose', { 'c-marketing-section--tint': tint }]}>
+<section class:list={['c-marketing', 'c-marketing-section', 'prose', { 'c-marketing-section--tint': tint }]}>
   <div class="c-section__inner"><slot /></div>
 </section>

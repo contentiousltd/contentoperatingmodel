@@ -485,8 +485,10 @@ carry. Each is phrased as the decision needed, per `GAPS.md`'s rule.
    in `spacing.css` as documented rem values, and say range syntax is the
    convention.
 8. **Brand assets sized for use.** `brand/content-operating-model/logo.png`
-   is 160px; the site carries its own 1200px cut and a pale cut the package
-   does not have. Decision: which is canonical, and whether the brand folder
+   is 160px and the earlier colourway; since 8 September the site's mark is
+   the apparatus in the sapling colourway, with a pale cut for the dark
+   ground, both local. The brand set should carry this colourway and its
+   pale cut. Decision: which is canonical, and whether the brand folder
    should ship the pale variant and a hero-size cut, with a note on the
    `astro:assets` idiom (`width` plus `densities` for marks, `layout:
    constrained` for art).
