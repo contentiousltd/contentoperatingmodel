@@ -11,6 +11,10 @@ what Claude Design needs to decide.
 Where a fix lives: `src/styles/site.css` unless stated. Everything here is
 scoped to this product and goes when the system answers it.
 
+Roadmap: the work is ROAD-1367 (Done); taking this ledger to Claude Design
+and closing its items is ROAD-1368 (Next). The policy is
+[ADR-COM-0005](adr/adr-com-0005-design-deviations-are-ledgered.md).
+
 ## Fixed upstream, not deviations
 
 1. **`@contentious/ui` never shipped the marketing kit.** The door import in
