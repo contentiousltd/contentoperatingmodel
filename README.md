@@ -19,6 +19,8 @@ npm run build        # build, then the postbuild machine-door validation
 
 Node 22.12 or later, per `.nvmrc` and Astro 7.
 
+Previewing the dev server from another machine, over Tailscale: Vite refuses hostnames it does not know, so put the MagicDNS name in `.env` as `DEV_ALLOWED_HOSTS` (see `.env.example`) and open `http://<name>:4321`. The dev server serves font files immutable so that resizing does not flash the fallback face; that is a dev-only plugin in `astro.config.mjs`, and the build does not need it. Layout claims are checked by measurement, not by eye: see [ADR-COM-0005](docs/adr/adr-com-0005-design-deviations-are-ledgered.md).
+
 ## How it is put together
 
 ```

@@ -12,6 +12,7 @@ Significant technical decisions for contentoperatingmodel.com, with the reasonin
 | [COM-0002](adr-com-0002-astro-static-site.md) | Astro static site on Netlify, with the move to Railway sized in advance | Accepted | 2026-09-07 |
 | [COM-0003](adr-com-0003-framework-as-code.md) | The framework is code; Notion is the workshop | Accepted | 2026-09-07 |
 | [COM-0004](adr-com-0004-machine-door.md) | The machine door is a build output, and the framework versions as content | Accepted | 2026-09-07 |
+| [COM-0005](adr-com-0005-design-deviations-are-ledgered.md) | Design deviations are local, explicit and ledgered | Accepted | 2026-09-07 |
 
 ## When to write one
 
