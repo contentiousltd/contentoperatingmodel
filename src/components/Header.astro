@@ -1,29 +1,30 @@
 ---
 // .c-topbar is the design system's chrome component. It is app chrome doing
 // marketing duty here, which is what every other site in the suite does and
-// what the COM reference page records as needing a marketing variant.
-const links = [
-  { href: '/framework', label: 'The framework' },
-  { href: '/toolkit', label: 'The toolkit' },
-  { href: '/changelog', label: 'Changelog' },
-];
-const path = Astro.url.pathname.replace(/\.html$/, '').replace(/\/$/, '') || '/';
-// astro:assets, as contentious.ltd: hashed WebP with a srcset, sized to the
-// use. The mark renders at 1.67u, 33-40px, so 1x/2x/3x of 40.
+// what the COM reference page records as needing a marketing variant
+// (docs/design-deviations-2026-09-07.md item 25).
 import { Image } from 'astro:assets';
-import apparatus from '../assets/com-apparatus.png';
+// The product mark from the package's brand set, not a local copy: 320px, so
+// the 40px mark has its 2× rendition. layout="fixed" gives the element its
+// real 40×40 intrinsic size and a 1×/2× srcset.
+import mark from '@contentious/ui/brand/content-operating-model/logo@2x.png';
+import { NAV, SITE_NAME } from '@/config/site';
+import { canonicalPath } from '@/lib/urls';
+
+const path = canonicalPath(Astro.url.pathname);
+const current = (href: string) => (path === href ? 'page' : undefined);
 ---
 <header class="c-marketing c-topbar">
   <a class="c-topbar__brand display-heading" href="/">
-    <Image src={apparatus} alt="" widths={[40, 80, 120]} sizes="40px" loading="eager" decoding="async" />
-    <span>Content Operating Model</span>
+    <Image src={mark} alt="" width={40} height={40} layout="fixed" loading="eager" />
+    <span>{SITE_NAME}</span>
   </a>
   <nav class="c-topbar__right" aria-label="Main">
-    {links.map((link) => (
-      <a href={link.href} aria-current={path === link.href ? 'page' : undefined}>{link.label}</a>
+    {NAV.map((link) => (
+      <a href={link.href} aria-current={current(link.href)}>{link.label}</a>
     ))}
   </nav>
-  <button class="c-topbar__menu" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="site-menu">
+  <button class="c-topbar__menu site-control" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="site-menu" data-menu-open>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
       <path d="M4 6h16M4 12h16M4 18h16" />
     </svg>
@@ -31,44 +32,47 @@ import apparatus from '../assets/com-apparatus.png';
 </header>
 
 {/* Full-screen mobile nav, as contentious.ltd and contentmaturity.com, on
-    Julius's call over the design system's sheet. See
-    docs/design-deviations-2026-09-07.md item 20. */}
-<div class="site-menu" id="site-menu" role="dialog" aria-modal="true" aria-label="Menu" aria-hidden="true">
-  <button class="site-menu__x" type="button" aria-label="Close menu" data-menu-close>
+    Julius's call over the design system's sheet (ledger item 20). A native
+    <dialog>: showModal() gives the focus trap, Escape, the top layer and
+    inertness of the page behind it, so the script only has to open, close
+    and mirror the state onto the trigger. */}
+<dialog class="c-marketing site-menu" id="site-menu" aria-label="Menu">
+  <button class="site-menu__x site-control" type="button" aria-label="Close menu" data-menu-close>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
       <path d="M6 6l12 12M18 6L6 18" />
     </svg>
   </button>
-  <nav class="site-menu__links" aria-label="Main">
-    {links.map((link, n) => (
-      <a
-        class="site-menu__link"
-        href={link.href}
-        style={`--i: ${n}`}
-        aria-current={path === link.href ? 'page' : undefined}
-      >{link.label}</a>
+  <nav class="site-menu__links" aria-label="Site">
+    {NAV.map((link, n) => (
+      <a class="site-menu__link" href={link.href} style={`--i: ${n}`} aria-current={current(link.href)}>{link.label}</a>
     ))}
   </nav>
-</div>
+</dialog>
 
 <script>
-  const trigger = document.querySelector<HTMLButtonElement>('.c-topbar__menu');
-  const host = document.getElementById('site-menu');
-  if (trigger && host) {
-    const setOpen = (open: boolean) => {
-      host.classList.toggle('is-open', open);
-      host.setAttribute('aria-hidden', String(!open));
+  const trigger = document.querySelector<HTMLButtonElement>('[data-menu-open]');
+  const menu = document.getElementById('site-menu') as HTMLDialogElement | null;
+  if (trigger && menu) {
+    const reflect = (open: boolean) => {
       trigger.setAttribute('aria-expanded', String(open));
       document.body.classList.toggle('has-menu-open', open);
-      if (open) host.querySelector<HTMLElement>('.site-menu__x')?.focus();
-      else trigger.focus();
     };
-    trigger.addEventListener('click', () => setOpen(!host.classList.contains('is-open')));
-    host.querySelectorAll('[data-menu-close], .site-menu__link').forEach((el) =>
-      el.addEventListener('click', () => setOpen(false)),
+    trigger.addEventListener('click', () => {
+      menu.showModal();
+      reflect(true);
+    });
+    menu.querySelectorAll<HTMLElement>('[data-menu-close], .site-menu__link').forEach((el) =>
+      el.addEventListener('click', () => menu.close()),
     );
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && host.classList.contains('is-open')) setOpen(false);
+    // Fires for close(), Escape and a link click alike.
+    menu.addEventListener('close', () => {
+      reflect(false);
+      trigger.focus();
+    });
+    // If the viewport grows past the chrome breakpoint while the menu is open,
+    // the desktop nav returns and the dialog would sit invisibly on top of it.
+    matchMedia('(width >= 48rem)').addEventListener('change', (e) => {
+      if (e.matches && menu.open) menu.close();
     });
   }
 </script>

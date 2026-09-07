@@ -1,468 +1,18 @@
 /* ================================================================
-   Page CSS for contentoperatingmodel.com.
-
-   Tokens only: no hex, no palette copies, no invented values. Anything
-   this file needs that the design system does not answer is a GAPS.md
-   entry in contentious-ui, not a value decided here. Enforced by
-   npm run check:tokens.
-
-   Component styling comes from the design system's c-* classes. What
-   belongs here is page-specific layout and the two pieces the COM
-   reference page builds from plain markup rather than components: the
-   three-layer stack and the 7x2 grid.
+   The site's own CSS: page layout and the pieces the COM reference
+   page (guidelines/pattern-com-page.html in the design skill) builds
+   from plain markup rather than components. Nothing here is a
+   deviation from the design system; deviations live in overrides.css
+   with their ledger numbers. Tokens only (npm run check:tokens).
    ================================================================ */
 
-:root {
-  /* Density. The product's theme sets 24px, the brand's marketing value, and
-     at the top responsive step (1.2 from 96rem) that is 28.8px body copy,
-     which Julius read as too big on a 5K monitor. 20px here: 24px body on a
-     wide monitor, 22px on a laptop, 20px on a phone, everything else in
-     proportion. Both tokens move together because density is one number
-     derived from deployment mode, not two. Unlayered so it beats the theme.
-     CLAUDE.md's "24px" line needs updating if this stays. 7 September 2026. */
-  --base-font-size: 20px;
-  --marketing-font-size: 20px;
-}
-
-/* Font smoothing, as the COM reference page's own body rule and
-   contentious.ltd: antialiased. Without it macOS renders Bely with subpixel
-   smoothing and the text reads a weight heavier than the studio site's. */
-body {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Prose headings in Bely Display, never bold: this repo's own rule for every
-   heading. The library's .prose h2 / .prose h3 set the text face, and they are
-   unlayered on purpose (to beat @tailwindcss/typography), so this has to be
-   unlayered too or it loses regardless of source order. */
-.prose h2,
-.prose h3 {
-  font-family: var(--font-heading-display);
-  font-weight: 400;
-}
-
-/* The library's --font-size-h2 (2.8em × step) put prose h2s at 67px under a
-   74px h1. contentious.ltd's h2 is 0.71 of its h1, Maturity Tool's 0.8 (the
-   system's .type-h2); --t-title, 2.4u, sits between them at 0.78. */
-.prose h2 {
-  font-size: var(--t-title);
-}
-
 @layer components {
-  /* The nav is app chrome doing marketing duty, and .c-topbar is nowrap
-     because it was drawn at the app's 19px. At the front door's 24px the
-     brand plus links plus a button overflow a narrow viewport, so it wraps
-     here. The design round records this as needing a marketing nav variant;
-     this is the same patch its own specimen page carries, and it goes when
-     that variant lands. */
-  .c-topbar {
-    flex-wrap: wrap;
-    row-gap: calc(var(--u) * 0.5);
-  }
-
-  /* The band's edge and behaviour, as contentious.ltd's header: no hairline
-     (the system's 1px --rule-field read as a gap once the page went paler),
-     a subtle shadow instead, and it stays put on scroll. The system has no
-     chrome shadow token; --shadow-sm is the quietest it has. Julius's call,
-     7 September 2026. */
-  .c-topbar {
-    border-bottom: 0;
-    box-shadow: var(--shadow-sm);
-    position: sticky;
-    top: 0;
-    z-index: var(--z-sticky);
-  }
-
-  /* ONE COLUMN, ONE CONVENTION. The family's column is --container-max-width
-     (1080px): contentious.ltd, the footer, .c-page and the COM reference page
-     all sit on it. The library's .c-section__inner is an 80rem box with
-     padding INSIDE it, so its text edge is never where the design system's
-     chrome column (max(gutter, (100% - column) / 2)) puts the topbar's. This
-     re-points every container on the site to contentious.ltd's convention:
-     the column plus a gutter each side, padding OUTSIDE the column, so the
-     content edge is max(gutter, (100% - 1080px) / 2) at every width - the
-     chrome column's own formula, with the topbar's own gutter. Header, body
-     and footer then agree with no override on the band. See
-     docs/design-deviations-2026-09-07.md. */
-  .c-section__inner,
-  .c-footer__in,
-  .c-footer__legal {
-    max-width: calc(var(--container-max-width) + 2 * var(--u) * 2.22);
-    padding-inline: calc(var(--u) * 2.22);
-  }
-
-  /* The brand. The design system's .c-topbar__brand is Bely (text face) at
-     700 and 1.17u, drawn for the app. Here it carries .display-heading, which
-     swaps in Bely Display, and a display face is never bold: at 700 it was
-     being synthesised. Display face, 400, at the body role. Julius's call,
-     7 September 2026; logged in docs/design-deviations-2026-09-07.md. */
-  .c-topbar__brand {
-    font-family: var(--font-heading-display);
-    font-weight: 400;
-    font-size: var(--t-ui);
-  }
-
-  /* The mark now comes through astro:assets with its intrinsic width and
-     height as attributes; the system sets only its height, so without this
-     the width followed the attribute and the mark rendered 800px wide. */
-  .c-topbar__brand img {
-    width: auto;
-  }
-
-  /* THE HERO'S ROOM, measured from maturitytool.com and expressed in --u so it
-     takes the same responsive step. MT: eyebrow to heading 24px, heading to
-     lede 24px, lede to button 32px, heading 74px at line-height 1.2 (its
-     .type-h1: 3.5 × 17.6px × the multiplier), at u = 24. The system's
-     .c-hero gives 8 / 10 / 18px and a 2.4u heading at 1.02, which read as
-     cramped beside it. Julius's call, 7 September 2026. */
-  .c-hero .c-eyebrow {
-    margin-bottom: calc(var(--u) * 1.5); /* MT's 24px read as too close under a 74px heading; 36px at u = 24 */
-  }
-
-  .c-hero__title {
-    font-size: calc(var(--u) * 3.08);
-    line-height: 1.2;
-    margin-bottom: var(--u);
-  }
-
-  .c-hero__intro {
-    margin-bottom: calc(var(--u) * 1.33);
-  }
-
-  /* The artwork's column. The system's .c-hero is 1.1fr 1fr from 52rem, which
-     on the 1080px column gives the apparatus 491px; maturitytool.com's tree
-     gets 576. 1fr 1.25fr puts it there. Two classes because a single-class
-     rule measured as losing to something at 1:1. */
-  @media (min-width: 52rem) {
-    .c-section__inner.c-hero {
-      grid-template-columns: 1fr 1.25fr;
-    }
-  }
-
-  /* Below that, one column that can shrink: a 1fr track floors at its
-     longest unbreakable word, and "organisations," at the phone's 61.6px
-     title was 431px wide and pushed the whole page to 476px. minmax(0, 1fr)
-     keeps the overflow inside the column, and the title hyphenates as the
-     last resort (lang="en-GB" is set on <html>). */
-  @media (max-width: 51.99rem) {
-    .c-section__inner.c-hero {
-      grid-template-columns: minmax(0, 1fr);
-    }
-
-    .c-hero__title {
-      hyphens: auto;
-      overflow-wrap: anywhere;
-    }
-  }
-
-  /* The hero band. Maturity Tool's hero sits paler than the body beneath it.
-     The page ground here stays the block's limestone-600; the hero takes the
-     block's own section wash, limestone-400 to 550, which sits between the
-     chrome (300, "too pale" when tried) and the page. Julius's call,
-     7 September 2026. */
-  .hero-band {
-    background: var(--wash-section);
-    /* MT's hero padding is the library's .c-section, 5rem each way. Set here
-       rather than by that class: the design system's own .c-section is the
-       app spacer (margin-top 2.33u) and painted a strip of page ground
-       between the topbar and the hero. */
-    padding-block: 5rem;
-  }
-
-  /* A button that is an <a> loses its text on hover: the system's bare
-     a:hover (0,1,1) sets color to --accent-link-hover and .c-button (0,1,0)
-     only sets its colour at rest, so the hero CTA went sapling-750 on
-     sapling-700, ~1.26:1, exactly what the COM reference page's own note
-     warns of. Round 07c fixed the underline on the same path but not the
-     colour. The variants (--ghost etc.) already win at (0,2,0). */
-  a.c-button:hover,
-  a.c-button:focus-visible {
-    color: var(--text-on-accent);
-  }
-
-  /* TEXT LINKS: the system's sunshine underline, but it fades in and thickens
-     over the slow curve instead of snapping on, as contentious.ltd's does
-     (ltd: a border growing 0 → 6px over 1.5s; the system's slowest token is
-     --duration-glacial, 800ms). Done with text-decoration, not a border: a
-     border changes the box, so on the nav links, which are flex items, the
-     text rose as the line grew, and border widths step in whole pixels. The
-     decoration sits at a fixed offset and thickens downward from it, and the
-     box never moves. Whole-object links (footer lists, buttons) keep the
-     system's opt-out. Julius's call, 7 September 2026. */
-  .c-marketing-section a:not(.c-button),
-  .c-footer p a,
-  .c-topbar__right a {
-    text-decoration: none;
-    /* The line is a box-shadow offset downward: a bar under the box that
-       grows DOWN from it, with colour and thickness both interpolated,
-       painting outside the box so nothing moves. text-decoration was tried
-       first; Chrome does not animate its thickness. Twice --duration-glacial
-       is 1.6s, contentious.ltd's 1.5s in the system's terms, and the same
-       curve runs in reverse on the way out. */
-    box-shadow: 0 0 0 0 transparent;
-    box-decoration-break: clone;
-    -webkit-box-decoration-break: clone;
-    transition: box-shadow calc(var(--duration-glacial) * 2) var(--ease-in-out),
-                color var(--motion-state);
-  }
-
-  .c-marketing-section a:not(.c-button):hover,
-  .c-marketing-section a:not(.c-button):focus-visible,
-  .c-topbar__right a:hover,
-  .c-topbar__right a:focus-visible {
-    text-decoration: none;
-    /* Sapling, not the system's sunshine --link-underline, on Julius's call:
-       sapling-500 on the page. A palette stop because no COM semantic token
-       sits at 500; the ledger asks for one. */
-    box-shadow: 0 calc(var(--u) * 0.2) 0 0 var(--sapling-500);
-    /* In faster than out: this transition applies on the way in, the base
-       rule's 1.6s on the way out. */
-    transition: box-shadow var(--duration-slow) var(--ease-in-out),
-                color var(--motion-state);
-  }
-
-  .c-footer p a:hover,
-  .c-footer p a:focus-visible {
-    text-decoration: none;
-    /* On the footer's dark ground the link's own accent, which the system
-       re-points to sapling-400 there. */
-    box-shadow: 0 calc(var(--u) * 0.2) 0 0 var(--accent-link);
-    transition: box-shadow var(--duration-slow) var(--ease-in-out),
-                color var(--motion-state);
-  }
-
-  /* MOBILE NAV, full-screen, as contentious.ltd and contentmaturity.com, on
-     Julius's call over the system's sheet (.c-msheet) and its "never a
-     full-bleed menu page" rule. Limestone on sapling-700: --text-on-accent
-     on --accent, which is what those two resolve to here. Content Maturity's
-     burger, close-on-link and 48rem breakpoint kept. The trigger mirrors
-     .c-msheet__x, the one 44px control the system ships. */
-  .c-topbar__menu {
-    display: none;
-    width: 44px;
-    height: 44px;
-    margin-left: auto;
-    place-items: center;
-    border: 0;
-    background: transparent;
-    border-radius: var(--radius-control);
-    color: var(--text-secondary);
-    cursor: pointer;
-  }
-
-  .c-topbar__menu:hover {
-    background: var(--surface-hover);
-  }
-
-  .c-topbar__menu svg {
-    width: calc(var(--u) * 1.1);
-    height: calc(var(--u) * 1.1);
-  }
-
-  @media (max-width: 47.99rem) {
-    .c-topbar__right {
-      display: none;
-    }
-
-    .c-topbar__menu {
-      display: grid;
-      flex: none;
-    }
-
-    /* One row on a phone: the wrap patch above put the burger on a second
-       row under the brand once the two no longer fit in 311px. The wordmark
-       wraps beside its mark instead; the system's brand is nowrap. */
-    .c-topbar {
-      flex-wrap: nowrap;
-    }
-
-    .c-topbar__brand {
-      white-space: normal;
-      min-width: 0;
-    }
-  }
-
-  .site-menu {
-    position: fixed;
-    inset: 0;
-    z-index: var(--z-modal);
-    display: grid;
-    place-items: center;
-    background: var(--accent);
-    color: var(--text-on-accent);
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity var(--motion-exit), visibility 0s linear var(--duration-fast-exit);
-  }
-
-  .site-menu.is-open {
-    opacity: 1;
-    visibility: visible;
-    transition: opacity var(--motion-overlay), visibility 0s;
-  }
-
-  @media (min-width: 48rem) {
-    .site-menu {
-      display: none;
-    }
-  }
-
-  /* The close sits where the burger is in the bar beneath it. */
-  .site-menu__x {
-    position: absolute;
-    top: calc(var(--u) * 0.78);
-    right: calc(var(--u) * 2.22);
-    width: 44px;
-    height: 44px;
-    display: grid;
-    place-items: center;
-    border: 0;
-    background: transparent;
-    border-radius: var(--radius-control);
-    color: var(--text-on-accent);
-    cursor: pointer;
-  }
-
-  .site-menu__x svg {
-    width: calc(var(--u) * 1.1);
-    height: calc(var(--u) * 1.1);
-  }
-
-  .site-menu__links {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: calc(var(--u) * 1.5);
-  }
-
-  /* Rows fade and rise 14px, staggered from 110ms 26ms apart: the system's
-     own sheet motion, on a different surface. */
-  .site-menu__link,
-  .site-menu__link:hover,
-  .site-menu__link:focus-visible {
-    font-family: var(--font-heading-display);
-    font-weight: 400;
-    font-size: var(--t-section);
-    color: var(--text-on-accent);
-    text-decoration: none;
-    min-height: 44px;
-    display: flex;
-    align-items: center;
-  }
-
-  .site-menu__link {
-    opacity: 0;
-    transform: translateY(14px);
-    transition: opacity var(--motion-exit), transform var(--motion-exit);
-  }
-
-  .site-menu.is-open .site-menu__link {
-    opacity: 1;
-    transform: none;
-    transition: opacity var(--motion-reveal), transform var(--motion-reveal);
-    transition-delay: calc(110ms + var(--i) * 26ms);
-  }
-
-  .site-menu__link[aria-current="page"] {
-    box-shadow: 0 calc(var(--u) * 0.15) 0 0 var(--text-on-accent); /* the ground is the accent */
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .site-menu,
-    .site-menu.is-open,
-    .site-menu__link,
-    .site-menu.is-open .site-menu__link {
-      transition-duration: 120ms;
-      transition-delay: 0s;
-      transform: none;
-    }
-  }
-
-  body.has-menu-open {
-    overflow: hidden;
-  }
-
-  /* THE FOOTER AT PHONE WIDTHS. The system's .c-footer__in is a fixed
-     1fr 1fr grid and .c-footer__groups a column-flow grid, with no collapse,
-     so at 400px the link groups ran to 541px and the whole page scrolled
-     sideways. Below the chrome breakpoint: one column, groups as rows. */
-  @media (max-width: 47.99rem) {
-    .c-footer .c-footer__in {
-      grid-template-columns: 1fr;
-      gap: calc(var(--u) * 1.5);
-    }
-
-    .c-footer .c-footer__groups {
-      grid-auto-flow: row;
-      gap: calc(var(--u) * 1.5);
-    }
-
-    /* The system's brand is nowrap; beside the 115px mark that is 359px in a
-       272px column at 360px. Let the name wrap and the text block shrink. */
-    .footer-brand > div {
-      min-width: 0;
-    }
-
-    .footer-brand .c-footer__brand {
-      white-space: normal;
-    }
-  }
-
-  /* THE FOOTER'S THREE SIZES. The system gives it five (brand --t-section,
-     group headings --t-row, description --t-hint, links --t-ui, legal 0.7u),
-     and because the brand is a <p>, .c-footer p outranks .c-footer__brand
-     and the brand lands at --t-hint anyway. Two for the body of it and a
-     smaller third for the legal line, on Julius's call: headings --t-row,
-     text and links --t-ui, legal --t-hint. Two classes deep so they beat
-     .c-footer p (0,1,1) and .c-footer__group h4 (0,1,1). */
-  .c-footer .c-footer__brand,
-  .c-footer .c-footer__group h4 {
-    font-size: var(--t-ui); /* --t-row read as too big; one step down */
-  }
-
-  .c-footer p,
-  .c-footer .c-footer__links {
-    font-size: var(--t-hint);
-  }
-
-  .c-footer .c-footer__legal {
-    font-size: calc(var(--u) * 0.7); /* the system's own legal size, restated past .c-footer p */
-  }
-
-  /* The footer mark, as voicetoneandstyle.com: a block of its own beside the
-     name and description, 4.8u (VTS's 116px at u = 24), not the system's
-     29px inline with the wordmark, where the apparatus reads as texture. */
-  .footer-brand {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--u);
-  }
-
-  .footer-brand img {
-    height: calc(var(--u) * 4.8);
-    width: auto; /* the intrinsic width attribute otherwise wins and the row squashes it */
-    flex: none;
-    display: block;
-  }
-
-  /* The nav links are bare <a>s in .c-topbar__right and carried no type role,
-     so they sat at the body's 17.6px at every width while everything around
-     them scaled. Same role as the brand: one size across the header. */
-  .c-topbar__right a {
-    font-size: var(--t-ui);
-  }
-
-  .site-main {
-    display: block;
-  }
-
   /* Skip link: visible only when focused. */
   .skip-link {
     position: absolute;
     left: -9999px;
     top: 0;
-    z-index: 100;
+    z-index: var(--z-sticky);
     padding: calc(var(--u) * 0.5) var(--u);
     background-color: var(--surface-card);
     color: var(--text-strong);
@@ -470,5 +20,135 @@ body {
 
   .skip-link:focus {
     left: 0;
+  }
+
+  /* The page head on the framework, toolkit and changelog pages: eyebrow,
+     title, lede. The hero band carries the homepage's. */
+  .page-head {
+    padding-bottom: 0;
+  }
+
+  /* A decorative figure in the prose floats right of the heading that
+     follows it, and the copy wraps beside it. Its top margin sits the figure
+     level with the heading's top rather than above it. Below the chrome
+     breakpoint it is a centred block. The wide-width breakout is ledger 24
+     in overrides.css. */
+  .prose-figure {
+    float: right;
+    width: 36%;
+    height: auto;
+    margin: calc(var(--u) * 2.6) 0 var(--u) calc(var(--u) * 1.5);
+  }
+
+  @media (width < 48rem) {
+    .prose-figure {
+      float: none;
+      display: block;
+      width: 60%;
+      margin: calc(var(--u) * 2) auto 0;
+    }
+  }
+
+  /* THE LAYER STACK, as guidelines/pattern-com-page.html draws it: page
+     markup, not a component, until it appears on a third page. Three cards,
+     the top one on --surface-card-deep because the content layer is a
+     different kind of thing from the two foundations under it. Values are
+     the reference page's own. */
+  .stack {
+    display: grid;
+    gap: calc(var(--u) * 0.67);
+    margin-block: calc(var(--u) * 1.5);
+  }
+
+  .layer {
+    background: var(--surface-card);
+    border-radius: var(--radius-surface);
+    padding: calc(var(--u) * 1.11) calc(var(--u) * 1.22);
+  }
+
+  .layer--top {
+    background: var(--surface-card-deep);
+  }
+
+  .layer--top h3,
+  .layer--top p {
+    color: var(--text-strong);
+  }
+
+  .layer--top .c-eyebrow {
+    color: var(--accent-link-on-deep);
+  }
+
+}
+
+/* The stack's heading and copy sit inside .prose, whose h3 and p rules are
+   unlayered in the package, so these are unlayered too or they lose
+   regardless of source order. Values are the reference page's. */
+.prose .layer h3 {
+  font-family: var(--font-heading-display);
+  font-weight: 400;
+  font-size: var(--t-row);
+  color: var(--text-strong);
+  margin: 0;
+}
+
+.prose .layer p {
+  margin: calc(var(--u) * 0.22) 0 0;
+  font-size: var(--t-body-app);
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+@layer components {
+  /* The questions and the vocabulary: definition lists, one entry per
+     question or term, the term in the display face. The reset zeroes dl and
+     dd margins, so the rhythm is set here in --u. */
+  .questions > div,
+  .vocabulary > div {
+    margin-block: var(--u);
+  }
+
+  .questions dt,
+  .vocabulary dt {
+    font-size: var(--t-row);
+    color: var(--text-strong);
+  }
+
+  /* The rule and call grid: a plain table until the design round supplies
+     the 7×2 specimen (docs/plans/project-setup.md, Phase 0). Hairlines, not
+     boxes, as the system's rows. */
+  .grid {
+    width: 100%;
+    margin-block: calc(var(--u) * 1.5);
+    text-align: left;
+  }
+
+  .grid th,
+  .grid td {
+    padding: calc(var(--u) * 0.44) calc(var(--u) * 0.67) calc(var(--u) * 0.44) 0;
+    vertical-align: top;
+    border-bottom: 1px solid var(--rule-row);
+  }
+
+  .grid thead th {
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-size: var(--t-hint);
+    color: var(--text-secondary);
+  }
+
+  .grid tbody th {
+    font-family: var(--font-heading-display);
+    font-weight: 400;
+    white-space: nowrap;
+  }
+
+  /* A release on the changelog: the version heading carries its date. */
+  .release {
+    margin-block: calc(var(--u) * 1.5);
+  }
+
+  .release h2 .meta {
+    display: block;
   }
 }

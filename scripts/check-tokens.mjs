@@ -16,29 +16,22 @@
  * The package promises its own token-copy detector (ADR-0011 §5). When it
  * ships, this script is deleted in favour of it rather than kept alongside.
  */
-import { readdir, readFile } from 'node:fs/promises';
-import { join, extname } from 'node:path';
+import { readFile } from 'node:fs/promises';
+import { walk } from './lib/walk.mjs';
 
 const ROOT = 'src';
 const EXTENSIONS = new Set(['.css', '.astro', '.ts', '.tsx', '.jsx', '.mdx', '.md']);
-const HEX = /#[0-9a-fA-F]{3,8}\b/g;
+// A hex literal, not a URL fragment: `#face` after a quote or bracket is an
+// anchor (href="#face", [text](#bad)), so the character before the # must not
+// be one of those.
+const HEX = /(?<!["'(\/])#[0-9a-fA-F]{3,8}\b/g;
 const PALETTE_FAMILIES =
   'limestone|gloaming|sunshine|wave|fire|sapling|coffee|sorbet|amber|olive|lichen';
 const LOCAL_PALETTE = new RegExp(`^\\s*--(${PALETTE_FAMILIES})-\\d{2,3}\\s*:`, 'gm');
 
-async function walk(dir) {
-  const out = [];
-  for (const entry of await readdir(dir, { withFileTypes: true })) {
-    const full = join(dir, entry.name);
-    if (entry.isDirectory()) out.push(...(await walk(full)));
-    else if (EXTENSIONS.has(extname(entry.name))) out.push(full);
-  }
-  return out;
-}
-
 const failures = [];
 
-for (const file of await walk(ROOT)) {
+for (const file of await walk(ROOT, EXTENSIONS)) {
   const source = await readFile(file, 'utf8');
 
   // Strip comments before matching: a comment may legitimately quote a hex

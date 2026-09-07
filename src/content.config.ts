@@ -1,4 +1,5 @@
-import { defineCollection, z } from 'astro:content';
+import { defineCollection } from 'astro:content';
+import { z } from 'astro/zod';
 import { glob } from 'astro/loaders';
 
 /**
@@ -36,6 +37,10 @@ const pages = defineCollection({
  * one, deliberately – it is a collection so the page's prose is authored as
  * markdown beside src/data/framework.ts rather than inside a component, and
  * one entry because ADR-COM-0003 gives the framework a single canonical URL.
+ * It is MDX: the data-driven blocks (layers, questions, the grid, the
+ * vocabulary) are components rendering src/data/framework.ts, placed in the
+ * prose where they belong, so the page and its Markdown twin come from one
+ * file (docs/optimisations-2026-09-07.md §2.1).
  */
 const framework = defineCollection({
   loader: glob({ base: 'src/content/framework', pattern: '**/*.{md,mdx}' }),

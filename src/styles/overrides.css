@@ -1,0 +1,586 @@
+/* ================================================================
+   Overrides: what the design system should have supplied.
+
+   Every block here exists because @contentious/ui does not yet answer
+   something, and each carries the number of its entry in
+   docs/design-deviations-2026-09-07.md as "ledger N". When the system
+   answers, the block goes and the entry moves to Answered.
+   scripts/check-ledger.mjs fails the build if a block has no number or
+   a number has no entry. Tokens only: no hex, no palette copies, no
+   invented values (npm run check:tokens).
+
+   Breakpoints use range syntax ((width < 48rem)), which every browser
+   has had since 2023, so there are no .99rem hacks. 48rem is the
+   system's chrome breakpoint and 52rem its hero breakpoint; neither has
+   a published token (ledger 27 asks for one).
+   ================================================================ */
+
+/* ---- Density and the shared measures ---------------------------------- */
+
+/* ledger 8: density 24px → 20px. The product's theme sets 24px, the brand's
+   marketing value, and at the top responsive step that is 28.8px body copy,
+   which read as too big on a 5K monitor. Both tokens move together because
+   density is one number derived from deployment mode, not two. Unlayered so
+   it beats the theme. The gutter and column are the family's, declared once
+   here so the container (ledger 4), the breakout (ledger 24) and the menu
+   (ledger 20) all read the same value. */
+:root {
+  --base-font-size: 20px;
+  --marketing-font-size: 20px;
+  --gutter: calc(var(--u) * 2.22);
+  --column: var(--container-max-width);
+}
+
+/* ledger 8: the phone step. The package's --text-multiplier runs 1 / 1.1 /
+   1.2 from 32rem up, so phone and laptop text differ by 10% at most;
+   contentious.ltd carries a ×0.9 step below 32rem that the package lacks.
+   Unlayered so it beats the package's @layer base rule at the same width. */
+@media (width <= 32rem) {
+  :root {
+    --text-multiplier: 0.9;
+  }
+}
+
+/* ledger 26: body text on the density. The package's base.css sets body to
+   1.1rem, which is 17.6px of the browser's 16px whatever --base-font-size
+   says, and only .prose and the --t-* roles re-anchor. Measured on
+   /framework: 24px prose beside 17.6px data sections. One rule puts every
+   marketing section on the body role. And because the package's .prose sets
+   the unscaled --base-font-size on the block and scales only p and li (a dd
+   or td inside .prose measured 20px beside 24px paragraphs), the .prose
+   rules are met unlayered, at the same specificity, later in the cascade. */
+@layer components {
+  .c-marketing-section {
+    font-size: var(--t-body);
+  }
+}
+
+.prose,
+.prose p,
+.prose li {
+  font-size: var(--t-body);
+}
+
+/* ledger 26: .prose p also reaches the eyebrow, a <p>, and would put the
+   label at body size with a paragraph's margin. Restated unlayered. */
+.prose .c-eyebrow {
+  font-size: var(--t-label);
+  margin: 0 0 calc(var(--u) * 0.33);
+}
+
+/* ledger 16: font smoothing, as the COM reference page's own body rule and
+   contentious.ltd. Without it macOS renders Bely with subpixel smoothing and
+   the text reads a weight heavier than the studio site's. */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ---- Type ------------------------------------------------------------- */
+
+/* ledger 13: prose headings in Bely Display, never bold, and on the roles:
+   h2 at --t-title, h3 at --t-section. The library's .prose h2 / .prose h3
+   set the text face and the em-based --font-size-h2 / h3 (67px and 36px on
+   a wide monitor under a 74px h1), and they are unlayered on purpose, so
+   this has to be unlayered too. */
+.prose h2,
+.prose h3 {
+  font-family: var(--font-heading-display);
+  font-weight: 400;
+}
+
+.prose h2 {
+  font-size: var(--t-title);
+}
+
+.prose h3 {
+  font-size: var(--t-section);
+}
+
+/* ledger 27: one type scale. The package ships two (em-based type-* and the
+   --u roles) and they disagree on the same page; this site uses the roles
+   only. .page-title is the h1 of every page but the home hero and takes the
+   hero title's size (ledger 10) so the two front doors match; .page-lede is
+   --t-lede where the package's .type-intro was 1.3em; .meta is --t-hint
+   where .type-sm was a fixed 14px. */
+@layer components {
+  .page-title {
+    font-size: var(--t-title);
+    line-height: 1.2;
+    margin-bottom: var(--u);
+  }
+
+  @media (width >= 48rem) {
+    .page-title {
+      font-size: calc(var(--u) * 3.08);
+    }
+  }
+
+  .page-lede {
+    font-size: var(--t-lede);
+    line-height: var(--body-line-height);
+    margin-bottom: calc(var(--u) * 1.33);
+  }
+
+  .meta,
+  .questions__subtitle {
+    font-family: var(--font-body);
+    font-size: var(--t-hint);
+    color: var(--text-secondary);
+  }
+}
+
+/* ---- Chrome ----------------------------------------------------------- */
+
+@layer components {
+  /* ledger 25: the nav is app chrome doing marketing duty, and .c-topbar is
+     nowrap because it was drawn at the app's 19px. At the front door's size
+     the brand plus links plus a button overflow a narrow viewport, so it
+     wraps here. The design round records this as needing a marketing nav
+     variant; this is the same patch its own specimen page carries. */
+  .c-topbar {
+    flex-wrap: wrap;
+    row-gap: calc(var(--u) * 0.5);
+  }
+
+  /* ledger 12: the band's edge and behaviour, as contentious.ltd's header: no
+     hairline (the system's 1px --rule-field read as a gap once the page went
+     paler), a subtle shadow instead, and it stays put on scroll. The system
+     has no chrome shadow token; --shadow-sm is the quietest it has. */
+  .c-topbar {
+    border-bottom: 0;
+    box-shadow: var(--shadow-sm);
+    position: sticky;
+    top: 0;
+    z-index: var(--z-sticky);
+  }
+
+  /* ledger 4: one column, one convention. The library's .c-section__inner is
+     an 80rem box with padding INSIDE it, so its text edge is never where the
+     design system's chrome column puts the topbar's. This re-points every
+     container to contentious.ltd's convention on --container-max-width: the
+     column plus a gutter each side, padding OUTSIDE the column, so the content
+     edge is max(gutter, (100% - column) / 2) at every width, the chrome
+     column's own formula. Header, body and footer then agree with no
+     override on the band. */
+  .c-section__inner,
+  .c-footer__in,
+  .c-footer__legal {
+    max-width: calc(var(--column) + 2 * var(--gutter));
+    padding-inline: var(--gutter);
+  }
+
+  /* ledger 5: the brand. The system's .c-topbar__brand is Bely (text face) at
+     700 and 1.17u, drawn for the app. Here it carries .display-heading, which
+     swaps in Bely Display, and a display face is never bold: at 700 it was
+     being synthesised. Display face, 400, at the UI role. */
+  .c-topbar__brand {
+    font-family: var(--font-heading-display);
+    font-weight: 400;
+    font-size: var(--t-ui);
+  }
+
+  /* ledger 9: the nav links are bare <a>s in .c-topbar__right and carried no
+     type role, so they sat at the reset's 17.6px at every width while
+     everything around them scaled. Same role as the brand: one size across
+     the header. */
+  .c-topbar__right a {
+    font-size: var(--t-ui);
+  }
+}
+
+/* ---- The hero --------------------------------------------------------- */
+
+@layer components {
+  /* ledger 10: the hero's room, measured from maturitytool.com and expressed
+     in --u so it takes the same responsive step. MT: eyebrow to heading 24px,
+     heading to lede 24px, lede to button 32px, heading 74px at line-height
+     1.2, at u = 24. The system's .c-hero gives 8 / 10 / 18px and a 2.4u
+     heading at 1.02, which read as cramped beside it. The title is --t-title
+     below 48rem (at 3.08u a phone showed 62px over eight lines) and MT's
+     ratio from there up. */
+  .c-hero .c-eyebrow {
+    margin-bottom: calc(var(--u) * 1.5);
+  }
+
+  .c-hero__title {
+    font-size: var(--t-title);
+    line-height: 1.2;
+    margin-bottom: var(--u);
+  }
+
+  @media (width >= 48rem) {
+    .c-hero__title {
+      font-size: calc(var(--u) * 3.08);
+    }
+  }
+
+  .c-hero__intro {
+    margin-bottom: calc(var(--u) * 1.33);
+  }
+
+  /* ledger 10: the artwork's column. The system's .c-hero is 1.1fr 1fr from
+     52rem, which on the 1080px column gives the art 491px; maturitytool.com's
+     tree gets 576. 1fr 1.25fr puts it there. Two classes because a
+     single-class rule measured as losing to something at 1:1. */
+  @media (width >= 52rem) {
+    .c-section__inner.c-hero {
+      grid-template-columns: 1fr 1.25fr;
+    }
+  }
+
+  /* ledger 10: below that, one column that can shrink: a 1fr track floors at
+     its longest unbreakable word, and "organisations," at the phone's title
+     size pushed the whole page to 476px. minmax(0, 1fr) keeps the overflow
+     inside the column, and the title hyphenates as the last resort
+     (lang="en-GB" is set on <html>). */
+  @media (width < 52rem) {
+    .c-section__inner.c-hero {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .c-hero__title {
+      hyphens: auto;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  /* ledger 11: the hero band. Maturity Tool's hero sits paler than the body
+     beneath it. The page ground here stays the block's limestone-600; the
+     hero takes the block's own section wash, which sits between the chrome
+     (300, "too pale" when tried) and the page. MT's hero padding is the
+     library's .c-section, 5rem each way; set here rather than by that class,
+     because the design system's own .c-section is the app spacer (margin-top
+     2.33u) and painted a strip of page ground between the topbar and the
+     hero. */
+  .hero-band {
+    background: var(--wash-section);
+    padding-block: calc(var(--u) * 3.33);
+  }
+}
+
+/* ledger 24: the breakout, as contentious.ltd: at wide widths an image runs
+   past the column's right edge while the text stays in it. One value,
+   negative: the room between the column and the viewport minus the gutter,
+   capped at a fifth of the column (216px), so it grows from nothing at
+   1280px to the cap by about 1560px and never causes a scroll. Read by the
+   hero art and the prose figure. */
+@media (width >= 52rem) {
+  :root {
+    --breakout: max(
+      calc(-0.2 * var(--column)),
+      min(0px, calc(-1 * ((100vw - var(--column)) / 2 - var(--gutter))))
+    );
+  }
+}
+
+@layer components {
+  @media (width >= 52rem) {
+    /* ledger 24: the hero art takes the breakout, with air on every side. */
+    .c-hero__art {
+      margin-right: var(--breakout);
+      padding: var(--u);
+    }
+
+    /* ledger 24: and the prose figure breaks out too, shifted right past the
+       column and widened by the same amount, so the text keeps wrapping
+       against its left edge where it was. */
+    .prose-figure {
+      margin-right: var(--breakout);
+      width: calc(36% - var(--breakout));
+    }
+  }
+}
+
+/* ---- Links and buttons ------------------------------------------------ */
+
+@layer components {
+  /* ledger 14: a button that is an <a> loses its text on hover: the system's
+     bare a:hover (0,1,1) sets color to --accent-link-hover and .c-button
+     (0,1,0) only sets its colour at rest, so the hero CTA went sapling-750 on
+     sapling-700, about 1.26:1. The variants (--ghost etc.) already win. */
+  a.c-button:hover,
+  a.c-button:focus-visible {
+    color: var(--text-on-accent);
+  }
+
+  /* ledger 15: text links fade in and thicken on hover, as contentious.ltd's
+     do, instead of the system's underline snapping on. A box-shadow offset
+     downward: a bar growing down from under the box, colour and thickness
+     both interpolated, painting outside the box so nothing moves (a border
+     changed the box and text-decoration-thickness does not animate in
+     Chrome). In over --duration-slow, out over twice --duration-glacial
+     (1.6s, ltd's 1.5s in the system's terms). The colour is the product
+     accent rather than the system's sunshine, on Julius's call: sapling-500
+     on the page (a palette stop; no COM semantic token sits at 500) and
+     --accent-link on the inverse footer, where it resolves to sapling-400.
+     Each context sets --underline once and the rules below read it. */
+  .c-marketing-section,
+  .c-topbar__right {
+    --underline: var(--sapling-500);
+  }
+
+  .c-footer {
+    --underline: var(--accent-link);
+  }
+
+  .c-marketing-section a:not(.c-button),
+  .c-footer p a,
+  .c-topbar__right a {
+    text-decoration: none;
+    box-shadow: 0 0 0 0 transparent;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+    transition: box-shadow calc(var(--duration-glacial) * 2) var(--ease-in-out),
+                color var(--motion-state);
+  }
+
+  .c-marketing-section a:not(.c-button):hover,
+  .c-marketing-section a:not(.c-button):focus-visible,
+  .c-footer p a:hover,
+  .c-footer p a:focus-visible,
+  .c-topbar__right a:hover,
+  .c-topbar__right a:focus-visible {
+    text-decoration: none;
+    box-shadow: 0 calc(var(--u) * 0.2) 0 0 var(--underline);
+    transition: box-shadow var(--duration-slow) var(--ease-in-out),
+                color var(--motion-state);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .c-marketing-section a:not(.c-button),
+    .c-footer p a,
+    .c-topbar__right a {
+      transition-duration: var(--duration-fast-exit);
+    }
+  }
+}
+
+/* ---- Mobile nav ------------------------------------------------------- */
+
+@layer components {
+  /* ledger 20: full-screen mobile nav, as contentious.ltd and
+     contentmaturity.com, on Julius's call over the system's sheet
+     (.c-msheet) and its "never a full-bleed menu page" rule. Limestone on
+     sapling-700: --text-on-accent on --accent. The trigger and the close
+     mirror .c-msheet__x, the one 44px control the system ships; one class
+     for both. Below 48rem the topbar is forced back to one row and the
+     wordmark allowed to wrap beside its mark. */
+  .site-control {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    background: transparent;
+    border-radius: var(--radius-control);
+    cursor: pointer;
+  }
+
+  .site-control svg {
+    width: calc(var(--u) * 1.1);
+    height: calc(var(--u) * 1.1);
+  }
+
+  .c-topbar__menu {
+    display: none;
+    margin-left: auto;
+    color: var(--text-secondary);
+  }
+
+  .c-topbar__menu:hover {
+    background: var(--surface-hover);
+  }
+
+  @media (width < 48rem) {
+    .c-topbar__right {
+      display: none;
+    }
+
+    .c-topbar__menu {
+      display: grid;
+      flex: none;
+    }
+
+    .c-topbar {
+      flex-wrap: nowrap;
+    }
+
+    .c-topbar__brand {
+      white-space: normal;
+      min-width: 0;
+    }
+  }
+
+  /* ledger 20: the dialog itself. A <dialog> arrives with the UA's margins,
+     border and size caps; reset to the whole viewport on the accent. Open
+     and close animate with @starting-style and allow-discrete, so the fade
+     and the row stagger survive display: none. */
+  .site-menu {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    z-index: var(--z-modal);
+    display: none;
+    place-items: center;
+    background: var(--accent);
+    color: var(--text-on-accent);
+    opacity: 0;
+    transition: opacity var(--motion-exit), display var(--duration-fast-exit) allow-discrete, overlay var(--duration-fast-exit) allow-discrete;
+  }
+
+  .site-menu[open] {
+    display: grid;
+    opacity: 1;
+    transition: opacity var(--motion-overlay), display var(--duration-medium) allow-discrete, overlay var(--duration-medium) allow-discrete;
+
+    @starting-style {
+      opacity: 0;
+    }
+  }
+
+  .site-menu::backdrop {
+    background: transparent;
+  }
+
+  @media (width >= 48rem) {
+    .site-menu,
+    .site-menu[open] {
+      display: none;
+    }
+  }
+
+  /* The close sits where the burger is in the bar beneath it. */
+  .site-menu__x {
+    position: absolute;
+    top: calc(var(--u) * 0.78);
+    right: var(--gutter);
+    color: var(--text-on-accent);
+  }
+
+  .site-menu__links {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: calc(var(--u) * 1.5);
+  }
+
+  /* Rows fade and rise 14px, staggered from 110ms 26ms apart: the system's
+     own sheet motion, on a different surface. */
+  .site-menu__link,
+  .site-menu__link:hover,
+  .site-menu__link:focus-visible {
+    font-family: var(--font-heading-display);
+    font-weight: 400;
+    font-size: var(--t-section);
+    color: var(--text-on-accent);
+    text-decoration: none;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+
+  .site-menu[open] .site-menu__link {
+    opacity: 1;
+    transform: none;
+    transition: opacity var(--motion-reveal), transform var(--motion-reveal);
+    transition-delay: calc(110ms + var(--i) * 26ms);
+
+    @starting-style {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+  }
+
+  .site-menu__link[aria-current="page"] {
+    box-shadow: 0 calc(var(--u) * 0.15) 0 0 var(--text-on-accent);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .site-menu,
+    .site-menu[open],
+    .site-menu[open] .site-menu__link {
+      transition-duration: 120ms;
+      transition-delay: 0s;
+      transform: none;
+    }
+  }
+
+  body.has-menu-open {
+    overflow: hidden;
+  }
+}
+
+/* ---- The footer ------------------------------------------------------- */
+
+@layer components {
+  /* ledger 21: the footer overflows a phone. The system's .c-footer__in is a
+     fixed 1fr 1fr grid and .c-footer__groups a column-flow grid, with no
+     collapse, so at 400px the link groups ran to 541px and the whole page
+     scrolled sideways. Below the chrome breakpoint: one column, groups as
+     rows, and the nowrap brand name allowed to wrap beside the mark. */
+  @media (width < 48rem) {
+    .c-footer .c-footer__in {
+      grid-template-columns: 1fr;
+      gap: calc(var(--u) * 1.5);
+    }
+
+    .c-footer .c-footer__groups {
+      grid-auto-flow: row;
+      gap: calc(var(--u) * 1.5);
+    }
+
+    .footer-brand > div {
+      min-width: 0;
+    }
+
+    .footer-brand .c-footer__brand {
+      white-space: normal;
+    }
+  }
+
+  /* ledger 17: the footer's three sizes. The system gives it five, and
+     because the brand is a <p>, .c-footer p outranks .c-footer__brand and the
+     brand lands at --t-hint anyway. Headings and brand --t-ui, text and links
+     --t-hint, legal the system's own 0.7u restated past .c-footer p. Two
+     classes deep so they beat .c-footer p (0,1,1). */
+  .c-footer .c-footer__brand,
+  .c-footer .c-footer__group h4 {
+    font-size: var(--t-ui);
+  }
+
+  .c-footer p,
+  .c-footer .c-footer__links {
+    font-size: var(--t-hint);
+  }
+
+  .c-footer .c-footer__legal {
+    font-size: calc(var(--u) * 0.7);
+  }
+
+  /* ledger 18: the footer mark, as voicetoneandstyle.com: a block of its own
+     beside the name and description, 4.8u (VTS's 116px at u = 24), not the
+     system's 29px inline with the wordmark, where the apparatus reads as
+     texture. */
+  .footer-brand {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--u);
+  }
+
+  .footer-brand img {
+    /* Both axes, not height plus width: auto: the mark is lazy, and an
+       unloaded image with only a height has no width to derive, so the
+       footer shifted when it scrolled into view. The cut is square. */
+    height: calc(var(--u) * 4.8);
+    width: calc(var(--u) * 4.8);
+    flex: none;
+    display: block;
+  }
+}

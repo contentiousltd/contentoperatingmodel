@@ -257,3 +257,22 @@ export const VOCABULARY: VocabularyEntry[] = [
     rejected: true,
   },
 ];
+
+/**
+ * The anchors the framework page promises to keep (ADR-COM-0004 §5). The
+ * section ids are hand-set in src/content/framework/framework.mdx; the layer
+ * and question ids come from the data above. scripts/postbuild-validate.mjs
+ * fails the build if any of them is missing from the built page, so a deep
+ * link into the specification cannot break by accident.
+ */
+export const ANCHORS: string[] = [
+  'a-way-is-not-a-model',
+  'the-three-layers',
+  'the-seven-questions',
+  'rule-and-call',
+  'vocabulary',
+  'terms-not-used',
+  'version',
+  ...LAYERS.map((layer) => layer.id),
+  ...QUESTIONS.map((question) => question.id),
+];

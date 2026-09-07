@@ -1,0 +1,20 @@
+---
+/**
+ * The three-layer stack, as guidelines/pattern-com-page.html draws it: page
+ * markup, not a component, until it appears on a third page. Reads top-down
+ * on the page and bottom-up in the model, so LAYERS (bottom first) is reversed
+ * here. The content layer is the deep card because it is a different kind of
+ * thing from the two foundations, not because it matters more.
+ */
+import { LAYERS } from '@/data/framework';
+const stack = [...LAYERS].reverse();
+---
+<div class="stack">
+  {stack.map((layer) => (
+    <div class={`layer${layer.foundation ? '' : ' layer--top'}`} data-surface={layer.foundation ? undefined : 'deep'}>
+      <p class="c-eyebrow">{layer.foundation ? 'Foundation' : 'The working machinery'}</p>
+      <h3 id={layer.id}>{layer.name}</h3>
+      <p>{layer.summary}</p>
+    </div>
+  ))}
+</div>

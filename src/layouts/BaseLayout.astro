@@ -1,12 +1,16 @@
 ---
-import '../styles/index.css';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-import { buildJsonLd } from '../lib/structured-data';
+import '@/styles/index.css';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import { SITE_NAME, SITE_URL } from '@/config/site';
+import { articleNode, buildJsonLd, type JsonLdNode } from '@/lib/structured-data';
+import { canonicalPath } from '@/lib/urls';
+import { datesForPath } from '@/lib/lastmod.mjs';
 // The design system's base.css declares @font-face against the package's own
-// font files, which Vite hashes into /_astro/. Preloading COM's public/fonts
-// copies preloaded files the CSS never used. These resolve to the same asset
-// the CSS references, in dev and in the build.
+// font files, which Vite hashes into /_astro/. These resolve to the same
+// asset the CSS references, in dev and in the build, so the preload and the
+// stylesheet agree on one URL. Only the two faces every page paints above
+// the fold; italic and bold load on demand.
 import belyDisplayUrl from '@contentious/ui/fonts/BelyDisplay-Regular.woff2?url';
 import belyRegularUrl from '@contentious/ui/fonts/Bely-Regular.woff2?url';
 
@@ -16,26 +20,51 @@ interface Props {
   metaTitle?: string;
   description: string;
   /** Extra JSON-LD nodes for this page, merged with Organization and WebSite. */
-  jsonLd?: Record<string, unknown>[];
+  jsonLd?: JsonLdNode[];
+  /** Adds an Article node with the dates git knows for this route. */
+  article?: boolean;
+  /** The framework's version, carried on the Article node. */
+  version?: string;
   noindex?: boolean;
   /** Path of this page's Markdown twin, e.g. /framework.md. */
   markdownTwin?: string;
 }
 
-const { title, metaTitle, description, jsonLd = [], noindex, markdownTwin } = Astro.props;
+const {
+  title,
+  metaTitle,
+  description,
+  jsonLd = [],
+  article = false,
+  version,
+  noindex,
+  markdownTwin,
+} = Astro.props;
 
-const pageTitle = metaTitle ?? `${title} | Content Operating Model`;
+const pageTitle = metaTitle ?? `${title} | ${SITE_NAME}`;
 
 // 'file' build format puts .html in Astro.url.pathname; the canonical URL is
-// slash-free and extension-free, and the edge function makes the served URL
-// match it. See astro.config.mjs.
-const stripHtml = (p: string) => (p.endsWith('.html') ? p.slice(0, -'.html'.length) : p);
-const stripSlash = (p: string) => (p.length > 1 && p.endsWith('/') ? p.slice(0, -1) : p);
-const canonicalPath = stripSlash(stripHtml(Astro.url.pathname)) || '/';
-const canonicalUrl = new URL(canonicalPath, Astro.site).href;
-const ogImage = new URL('/images/og-default.png', Astro.site).href;
+// slash-free, extension-free, and "/" for the homepage. src/lib/urls.ts.
+const path = canonicalPath(Astro.url.pathname);
+const site = Astro.site ?? new URL(`${SITE_URL}/`);
+const canonicalUrl = new URL(path, site).href;
+const ogImage = new URL('/images/og-default.png', site).href;
 
-const structuredData = buildJsonLd(Astro.site?.href ?? 'https://contentoperatingmodel.com/', jsonLd);
+const nodes: JsonLdNode[] = [...jsonLd];
+if (article) {
+  const dates = datesForPath(path);
+  nodes.push(
+    articleNode(site.href, {
+      url: canonicalUrl,
+      headline: title,
+      description,
+      published: dates.published,
+      modified: dates.modified,
+      version,
+    }),
+  );
+}
+const structuredData = buildJsonLd(site.href, nodes);
 ---
 
 <!doctype html>
@@ -51,14 +80,15 @@ const structuredData = buildJsonLd(Astro.site?.href ?? 'https://contentoperating
   {/* The machine door: every page's Markdown twin is discoverable from the
       page itself, not only from llms.txt. See ADR-COM-0004. */}
   {markdownTwin && (
-    <link rel="alternate" type="text/markdown" href={new URL(markdownTwin, Astro.site).href} />
+    <link rel="alternate" type="text/markdown" href={new URL(markdownTwin, site).href} />
   )}
 
   <meta property="og:title" content={pageTitle} />
   <meta property="og:description" content={description} />
-  <meta property="og:type" content="website" />
+  <meta property="og:type" content={article ? 'article' : 'website'} />
   <meta property="og:url" content={canonicalUrl} />
   <meta property="og:image" content={ogImage} />
+  <meta property="og:site_name" content={SITE_NAME} />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content={pageTitle} />
   <meta name="twitter:description" content={description} />
@@ -69,16 +99,17 @@ const structuredData = buildJsonLd(Astro.site?.href ?? 'https://contentoperating
   <link rel="icon" href="/favicon.ico" sizes="any" />
   <link rel="icon" type="image/png" href="/images/favicon-32.png" sizes="32x32" />
   <link rel="apple-touch-icon" href="/images/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
 
   <link rel="preload" href={belyDisplayUrl} as="font" type="font/woff2" crossorigin />
   <link rel="preload" href={belyRegularUrl} as="font" type="font/woff2" crossorigin />
 
-  <link rel="alternate" type="application/rss+xml" title="Content Operating Model releases" href="/rss.xml" />
+  <link rel="alternate" type="application/rss+xml" title={`${SITE_NAME} releases`} href="/rss.xml" />
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
   <Header />
-  <main id="main" class="site-main">
+  <main id="main">
     <slot />
   </main>
   <Footer />

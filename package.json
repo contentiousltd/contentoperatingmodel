@@ -1,11 +1,11 @@
 {
   "name": "contentoperatingmodel",
   "type": "module",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "contentoperatingmodel.com — the Content Operating Model framework, toolkit and, later, the component library.",
   "engines": {
-    "node": ">=22.12.0"
+    "node": ">=22.18.0"
   },
   "scripts": {
     "dev": "astro dev",
@@ -16,8 +16,10 @@
     "check": "astro check && tsc --noEmit",
     "lint:prose": "node scripts/lint-prose.mjs",
     "check:tokens": "node scripts/check-tokens.mjs",
+    "check:ledger": "node scripts/check-ledger.mjs",
     "check:ui-current": "node scripts/check-ui-current.mjs",
-    "lint": "npm run check && npm run lint:prose && npm run check:tokens"
+    "lint": "npm run check && npm run lint:prose && npm run check:tokens && npm run check:ledger && npm run check:ui-current",
+    "measure": "node scripts/measure.mjs"
   },
   "dependencies": {
     "@astrojs/markdown-remark": "^7.3.0",
@@ -26,11 +28,16 @@
     "@astrojs/sitemap": "^3.7.4",
     "@contentious/ui": "github:contentiousltd/contentious-ui#v0.14.2",
     "astro": "^7.3.1",
-    "remark-smartypants": "^3.0.2",
-    "zod": "^3.24.2"
+    "mdast-util-to-string": "^4.0.0",
+    "remark-mdx": "^3.1.1",
+    "remark-parse": "^11.0.0",
+    "remark-stringify": "^11.0.0",
+    "unified": "^11.0.5",
+    "unist-util-visit": "^5.1.0"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "playwright-core": "^1.55.0",
     "typescript": "^5.9.3"
   }
 }

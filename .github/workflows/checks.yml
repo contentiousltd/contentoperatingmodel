@@ -38,15 +38,17 @@ jobs:
 
       - run: npm ci
 
-      # Type-check, prose and tokens. check:tokens is the local stand-in for the
-      # token-copy detector suite ADR-0011 §5 promises the package will ship.
+      # Type-check, prose, tokens, the ledger and the design-system pin.
+      # check:tokens is the local stand-in for the token-copy detector suite
+      # ADR-0011 §5 promises the package will ship. check:ledger keeps
+      # src/styles/overrides.css and the deviations ledger in agreement
+      # (ADR-COM-0005). check:ui-current: the design system is pinned by exact
+      # tag (suite ADR-0014 §2); a consumer may be deliberately behind, never
+      # silently behind.
       - run: npm run lint
 
-      # The design system is pinned by exact tag (suite ADR-0014 §2). A
-      # consumer may be deliberately behind, never silently behind.
-      - run: npm run check:ui-current
-
       # Build runs the postbuild validator: every page needs a description, a
-      # canonical, JSON-LD, a Markdown twin and no trailing-slash internal
-      # links, and llms.txt, the sitemap, robots.txt and the feed must exist.
+      # correct canonical, JSON-LD, a Markdown twin whose headings match the
+      # page's, and no trailing-slash internal links; llms.txt must list every
+      # twin; the framework page must carry its version and every anchor.
       - run: npm run build

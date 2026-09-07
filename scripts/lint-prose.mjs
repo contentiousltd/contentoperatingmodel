@@ -10,8 +10,8 @@
  * STRICT_PROSE_RULES=em-dash (set in CI) makes em dashes fatal. The advisory
  * rules stay advisory on purpose: a linter that cries wolf gets ignored.
  */
-import { readdir, readFile } from 'node:fs/promises';
-import { join, extname } from 'node:path';
+import { readFile } from 'node:fs/promises';
+import { walk } from './lib/walk.mjs';
 
 const ROOTS = ['src'];
 const EXTENSIONS = new Set(['.astro', '.md', '.mdx', '.ts']);
@@ -25,22 +25,12 @@ const ADVISORY = [
   [/\bnot only\b.{0,40}\bbut also\b/gi, 'AI tell'],
 ];
 
-async function walk(dir) {
-  const out = [];
-  for (const entry of await readdir(dir, { withFileTypes: true })) {
-    const full = join(dir, entry.name);
-    if (entry.isDirectory()) out.push(...(await walk(full)));
-    else if (EXTENSIONS.has(extname(entry.name))) out.push(full);
-  }
-  return out;
-}
-
 const strict = (process.env.STRICT_PROSE_RULES ?? '').split(',').filter(Boolean);
 let fatal = 0;
 let advisories = 0;
 
 for (const root of ROOTS) {
-  for (const file of await walk(root)) {
+  for (const file of await walk(root, EXTENSIONS)) {
     const source = await readFile(file, 'utf8');
     source.split('\n').forEach((line, index) => {
       const where = `${file}:${index + 1}`;

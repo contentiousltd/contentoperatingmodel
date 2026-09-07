@@ -1,0 +1,15 @@
+---
+/**
+ * A marketing section for MDX prose: the design system's .c-marketing-section
+ * with its column inside. `tint` takes the section wash. The Markdown twin
+ * unwraps it (src/lib/mdx-to-markdown.ts), so it carries no meaning a machine
+ * needs, only the page's rhythm.
+ */
+interface Props {
+  tint?: boolean;
+}
+const { tint = false } = Astro.props;
+---
+<section class:list={['c-marketing-section', 'prose', { 'c-marketing-section--tint': tint }]}>
+  <div class="c-section__inner"><slot /></div>
+</section>

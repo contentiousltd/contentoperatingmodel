@@ -22,7 +22,9 @@ export default (request) => {
 
 export const config = {
   path: '/*',
-  // Static assets never carry a trailing slash; skip them so the function
-  // isn't invoked on every hashed asset, font, and image request.
-  excludedPath: ['/_astro/*', '/fonts/*', '/images/*'],
+  // Static assets and the machine door never carry a trailing slash; skip
+  // them so the function is not invoked on every hashed asset, image, twin,
+  // feed or text file. (/fonts/ went when the preloads moved to the package's
+  // hashed files; see docs/design-deviations-2026-09-07.md item 7.)
+  excludedPath: ['/_astro/*', '/images/*', '/*.md', '/*.txt', '/*.xml', '/*.ico', '/*.webmanifest'],
 };

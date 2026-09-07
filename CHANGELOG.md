@@ -8,7 +8,52 @@ Developer-facing changes to this site. Follows [Keep a Changelog](https://keepac
 
 ## [Unreleased]
 
-The front door brought to the design system, then past it where the system fell short. Every departure from `@contentious/ui` is in `src/styles/site.css` with its reason and listed, with the decision it needs from Claude Design, in [docs/design-deviations-2026-09-07.md](docs/design-deviations-2026-09-07.md); item numbers below refer to it. [ADR-COM-0005](docs/adr/adr-com-0005-design-deviations-are-ledgered.md) is the policy.
+Ships as 0.2.0: new pages, features and checks (MINOR). Two pieces of work, both on 7 September 2026.
+
+### The optimisation audit, later the same day
+
+Everything in [docs/optimisations-2026-09-07.md](docs/optimisations-2026-09-07.md), applied; section numbers below refer to it. Sizes were measured before and after with `npm run measure` (ADR-COM-0005).
+
+#### Added
+
+- **Twins from the page's own source.** Every content file is MDX; the framework page is one file, `src/content/framework/framework.mdx`, with the data-driven blocks placed as components (`src/components/framework/`) and the sections wrapped in `<Band>`. The Markdown twin is a remark transform of that file (`src/lib/mdx-to-markdown.ts`) that swaps each component for its Markdown rendering, unwraps layout, substitutes expressions and drops decorative images, so the twin is the page by construction (§2.1, §2.2). The toolkit's copy moved into `src/content/pages/toolkit.mdx` and the changelog twin renders from the same data as the page.
+- **Hand-set anchors.** `## Heading \{#id\}` via `src/lib/remark-heading-ids.mjs`; the promised set is `ANCHORS` in `src/data/framework.ts` and the validator asserts each one (§2.3).
+- **Article structured data** on every page, with `datePublished` and `dateModified` from git (`src/lib/lastmod.mjs`, which also feeds the sitemap and now knows a route's data dependencies), `sameAs` on the Organization, `og:site_name` (§2.4).
+- **`src/config/site.ts`**: URL, name, navigation and family links, read by the header, footer, `llms.txt` and the structured data (§2.5). `src/lib/urls.ts` computes the canonical path once.
+- **Validator checks** (§2.6): the canonical's value, `og:url` matching it, `og:image` existing, the twin's h2s matching the page's, the twin's front matter naming the right canonical, `llms.txt` listing exactly the twins, every anchor present, `site.webmanifest` present.
+- **Responsive images by default**: `image.layout: 'constrained'` and `responsiveStyles` (§3.1). **Prefetch on hover** (§3.3). **Dev toolbar off** (§3.4).
+- **Netlify headers**: `/_astro/*` immutable for a year, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, `X-Frame-Options` (§1.7; ADR-COM-0002 amended). **A web manifest** with 192 and 512px icons (§1.8).
+- **`npm run check:ledger`** (`scripts/check-ledger.mjs`): every block in `src/styles/overrides.css` carries a `ledger N` tag and every tag has an entry (§4.4). **`npm run measure`** (`scripts/measure.mjs`): computed sizes at three widths through the installed Chrome (§6). `scripts/lib/walk.mjs` shared by the prose and token checks.
+- **The design gate covers Bash**: a shell command naming a UI file with a write verb is denied until the design skill has been invoked (§6).
+- **The layer stack** on the framework page, styled as `guidelines/pattern-com-page.html` draws it; the questions, vocabulary and rule-and-call table given structure on the roles.
+- Ledger items 25 (topbar wrap), 26 (body text at 17.6px) and 27 (one type scale).
+
+#### Changed
+
+- **Body copy is on the density everywhere** (§1.2, ledger 26). Before: prose paragraphs 22 / 24px, every paragraph, `dd` and `td` in the framework's data sections 17.6px, the layer headings 17.6px, all of `/toolkit` 17.6px. After: 18 / 22 / 24px at phone / laptop / wide on every element and page. Cause recorded for the package: `base.css` sets `body { font-size: 1.1rem }`.
+- **One type scale** (§4.1, ledger 27): the `type-h1 / h2 / intro / sm` classes and `display-heading` on headings are gone from the markup; `.page-title`, `.page-lede` and `.meta` on the `--t-*` roles replace them. Prose h3 on `--t-section` (ledger 13).
+- **CSS split by fate** (§4.4): `src/styles/site.css` is the site's own; `src/styles/overrides.css` is every ledger item, tagged. Range syntax for every media query (§4.2); `--gutter`, `--column` and `--underline` declared once (§4.3); the `.site-main` no-op and the two `width: auto` image patches deleted.
+- **The mobile menu is a `<dialog>`** opened with `showModal()`: focus trap, Escape and inertness of the page behind it for free; open and close animate with `@starting-style`; the desktop and mobile navs no longer share a landmark label (§5). Measured: focus stays inside through six Tabs, Escape closes, focus returns to the trigger.
+- **Marks through `layout="fixed"`** with real intrinsic sizes; the header mark imports from the package's `brand/` folder (§1.6). The hero art and the prose figure get `srcset` and `sizes` from the constrained layout (§1.3, §1.4); the figure breaks out with the hero (ledger 24, cap corrected to 0.2 × column).
+- **The homepage intro** is rendered as inline Markdown, so its link works (§1.5); `@astrojs/markdown-remark`'s `unified()` is the site's processor (Astro 7's `markdown.processor`), with smartypants built in. The framework page's version line takes its date from the latest release (§1.8). Footer mark sized on both axes so it holds its box before it loads.
+- `@/` path alias used throughout; the three unused aliases removed. `astro/zod` for schemas. Node 22.18+ (`engines`), so the validator can import the data module.
+- `netlify.toml` no longer repeats the Node version; the edge function skips `.md`, `.txt`, `.xml`, `.ico` and the manifest.
+- CI runs the staleness check through `npm run lint` rather than as a second step.
+
+#### Removed
+
+- `zod` and `remark-smartypants` as direct dependencies (unused, and built in respectively). `scripts/sitemap-lastmod.mjs` moved to `src/lib/lastmod.mjs`.
+
+#### Fixed
+
+- **The homepage's canonical URL and `og:url` were `/index`** (§1.1). Now `/`, and the validator checks the value on every page.
+- The hero's `sizes` attribute predated the breakout, so at 1× Chrome stretched the 600w rendition over 649 to 682px (§1.3). The prose image shipped as one 1200px file for a 520 to 605px slot (§1.4).
+- The intro's link in `home.mdx` was mistyped and, as an escaped expression, could not have rendered; "we deliver build" (§1.5).
+- Netlify was serving hashed assets with `max-age=0` (§1.7).
+
+### The front door, earlier the same day
+
+The front door brought to the design system, then past it where the system fell short. Every departure from `@contentious/ui` is in `src/styles/overrides.css` with its reason and listed, with the decision it needs from Claude Design, in [docs/design-deviations-2026-09-07.md](docs/design-deviations-2026-09-07.md); item numbers below refer to it. [ADR-COM-0005](docs/adr/adr-com-0005-design-deviations-are-ledgered.md) is the policy.
 
 ### Added
 

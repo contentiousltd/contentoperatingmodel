@@ -1,22 +1,26 @@
 ---
 import { getEntry, render } from 'astro:content';
-import BaseLayout from '../layouts/BaseLayout.astro';
-// astro:assets, as contentious.ltd. The art fills 1.25/2.25 of the 1080px
-// column at most, ~575px, and the column's width below 52rem; it is the
-// largest thing above the fold, so eager and high priority.
 import { Image } from 'astro:assets';
-import apparatus from '../assets/com-apparatus.png';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { renderInline } from '@/lib/inline-markdown';
+// Julius's pick over the apparatus for the hero; the header and footer marks
+// stay on the apparatus. The largest thing above the fold, so eager and high
+// priority. width is the slot's upper bound with the breakout (ledger 24):
+// the constrained layout derives srcset and sizes from it.
+import heroArt from '@/assets/com-2.png';
 
 const home = await getEntry('pages', 'home');
-if (!home) throw new Error('src/content/pages/home.md is missing');
+if (!home) throw new Error('src/content/pages/home.mdx is missing');
 const { Content } = await render(home);
 const { eyebrow, heading, intro, cta } = home.data;
+const introHtml = intro ? await renderInline(intro) : undefined;
 ---
 <BaseLayout
   title={home.data.title}
   metaTitle={home.data.metaTitle}
   description={home.data.description}
   markdownTwin="/index.md"
+  article
 >
   {/* .hero-band carries the ground and the 5rem padding maturitytool.com's
       hero sits in. Not .c-section: the design system's .c-section is the app
@@ -28,7 +32,7 @@ const { eyebrow, heading, intro, cta } = home.data;
       <div>
         {eyebrow && <p class="c-eyebrow">{eyebrow}</p>}
         <h1 class="c-hero__title">{heading ?? home.data.title}</h1>
-        {intro && <p class="c-hero__intro">{intro}</p>}
+        {introHtml && <p class="c-hero__intro" set:html={introHtml} />}
         {cta && (
           <div class="c-hero__cta">
             <a class="c-button" href={cta.href}>{cta.label}</a>
@@ -36,15 +40,7 @@ const { eyebrow, heading, intro, cta } = home.data;
         )}
       </div>
       <div class="c-hero__art">
-        <Image
-          src={apparatus}
-          alt=""
-          widths={[400, 600, 800, 1200]}
-          sizes="(max-width: 52rem) calc(100vw - 88px), 575px"
-          loading="eager"
-          fetchpriority="high"
-          decoding="async"
-        />
+        <Image src={heroArt} alt="" width={800} loading="eager" fetchpriority="high" />
       </div>
     </div>
   </section>

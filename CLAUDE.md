@@ -15,9 +15,11 @@ COM is one product in the **Contentious family**. Decisions about anything that 
 
 ## The framework is data, not prose in a component
 
-`src/data/framework.ts` is the single source for the layers, the seven questions, the two registers, the fourteen cells and the vocabulary. The framework page, its Markdown twin, the JSON-LD `DefinedTermSet`, `llms.txt` and the toolkit all render from it. **Never type a question, a register or a definition anywhere else.** Two copies of a framework is the drift the Working reference exists to catch (ADR-COM-0003).
+`src/data/framework.ts` is the single source for the layers, the seven questions, the two registers, the fourteen cells, the vocabulary and the page's promised anchors (`ANCHORS`). The framework page, its Markdown twin, the JSON-LD `DefinedTermSet`, `llms.txt` and the toolkit all render from it. **Never type a question, a register or a definition anywhere else.** Two copies of a framework is the drift the Working reference exists to catch (ADR-COM-0003).
 
-Prose lives in `src/content/`, split by register: `pages/` is the editorial voice (home, the toolkit journey), `framework/` is the specification voice.
+Prose lives in `src/content/`, split by register: `pages/` is the editorial voice (home, the toolkit journey), `framework/` is the specification voice. Content files are MDX. The framework page is one file, `framework/framework.mdx`: its prose in the specification voice, with the data-driven blocks placed where they belong as components from `src/components/framework/` (`<Layers />`, `<Questions />`, `<RuleAndCall />`, `<Vocabulary />`) and its sections wrapped in `<Band>`. Headings carry hand-set anchors as `\{#id\}` (escaped braces, because MDX reads a brace as an expression). **Never put prose in a page template**; a page's `.astro` renders its content file and nothing more.
+
+Site-wide strings live in `src/config/site.ts`: the URL, the name, the navigation and the family links. Header, footer, `llms.txt` and the structured data read from it.
 
 The framework's own version (`FRAMEWORK_VERSION`, 0.9 today) is **content** and is not this repo's semver. Changing it means adding a release in `src/content/releases/`.
 
@@ -35,24 +37,32 @@ The framework's own version (`FRAMEWORK_VERSION`, 0.9 today) is **content** and 
 ## Typography
 
 - Headings use `font-display` (Bely Display) and are **never bold** – it has inherent display weight.
-- Base font size is `var(--base-font-size)`, **20px**, set in `src/styles/site.css` over the theme's 24px: the brand's marketing value read as too big on a large monitor (28.8px body copy at the top responsive step), and 20px gives 24px there, 22px on a laptop, 20px on a phone. Density is derived from deployment mode, not chosen. When the app arrives it takes 19px, and that is a property of those surfaces, not a change here. The override is recorded in `docs/design-deviations-2026-09-07.md` (item 8) for the signature block to settle.
-- Component styling comes from the design system's `c-*` classes. `src/styles/site.css` is for page layout only.
+- Base font size is `var(--base-font-size)`, **20px**, set in `src/styles/overrides.css` over the theme's 24px: the brand's marketing value read as too big on a large monitor (28.8px body copy at the top responsive step), and 20px gives 24px there, 22px on a laptop, 18px on a phone. Density is derived from deployment mode, not chosen. When the app arrives it takes 19px, and that is a property of those surfaces, not a change here. The override is recorded in `docs/design-deviations-2026-09-07.md` (item 8) for the signature block to settle.
+- **One type scale: the roles.** Sizes are `--t-*` (`--t-title`, `--t-lede`, `--t-body`, `--t-hint` …), never the package's em-based `type-*` classes or `--font-size-h*`, which are anchored to the reset's 17.6px and disagree with the roles on the same page (ledger items 26 and 27). Page titles take `.page-title`, ledes `.page-lede`, small metadata `.meta`.
+- Component styling comes from the design system's `c-*` classes. This site's CSS is two files, split by fate: `src/styles/site.css` is the site's own layout and the pieces the COM reference page builds from plain markup (the layer stack); `src/styles/overrides.css` is every rule the design system should have supplied, each block tagged `ledger N` with its entry in the deviations ledger. `npm run check:ledger` fails if a block has no number or a number has no entry. When the system answers an item, delete its block and move the entry to Answered.
+- **Media queries use range syntax** (`(width < 48rem)`), never `max-width: 47.99rem`. 48rem is the system's chrome breakpoint, 52rem its hero breakpoint.
+- **Images go through `astro:assets`.** `image.layout` is `constrained` in `astro.config.mjs`, so every `<Image>` and every markdown image gets a `srcset` and `sizes` from its `width`; fixed-size marks use `layout="fixed"` with `width` and `height`. Never hand-write `widths` or `sizes`. The header mark imports from the package's `brand/` folder, not a local copy.
+- **Measure, don't eyeball.** `npm run preview` in one terminal and `npm run measure` in another prints computed sizes at 400, 1440 and 2192px for a set of selectors (ADR-COM-0005). A layout claim in the ledger or a commit message carries its numbers.
 
 ## Machine door
 
-Every published page ships with a Markdown twin at the same path (`/framework` → `/framework.md`), stable hand-set anchors, JSON-LD, and an entry in `llms.txt`. `scripts/postbuild-validate.mjs` fails the build if any of that is missing. This is the product's whole reason for existing in the form it takes, so treat a validator failure as a content bug, not a build annoyance.
+Every published page ships with a Markdown twin at the same path (`/framework` → `/framework.md`), stable hand-set anchors, JSON-LD (Organization, WebSite, an Article with the dates git knows, and the framework's DefinedTermSet), and an entry in `llms.txt`. The twin is generated from the page's own MDX by `src/lib/mdx-to-markdown.ts`, which swaps each data component for its Markdown rendering (`src/lib/framework-markdown.ts`), so the twin is the page by construction. `scripts/postbuild-validate.mjs` fails the build if a twin is missing, if its h2s differ from the page's, if a canonical is wrong, if `llms.txt` and the twins disagree, or if an anchor in `ANCHORS` is missing. This is the product's whole reason for existing in the form it takes, so treat a validator failure as a content bug, not a build annoyance.
 
 ## Checks
 
 ```bash
-npm run lint            # astro check + tsc + prose + tokens
-npm run build           # build, then postbuild validation
+npm run lint             # astro check + tsc + prose + tokens + ledger + ui-current
+npm run build            # build, then postbuild validation
+npm run check:ledger     # overrides.css tags ↔ the deviations ledger
 npm run check:ui-current # is the pinned @contentious/ui the latest tag?
+npm run measure          # computed sizes at three widths, against npm run preview
 ```
+
+The design gate hook (`.claude/hooks/require-design-skill.py`) covers `Edit`, `Write` and `Bash`: a shell command that names a file under `src/` ending `.astro`, `.css`, `.tsx` or `.jsx` together with a write verb (`sed -i`, a redirect, `tee`, `cp`, `mv`, a heredoc, `python`, `node`) is denied until the `contentious-design` skill has been invoked in the session.
 
 ## Hosting
 
-Netlify, from `main`. The move to Railway is decided in advance rather than deferred: see [ADR-COM-0002](docs/adr/adr-com-0002-astro-static-site.md) for the trigger, the sized work and the named list of Netlify-specific things. **Do not add Netlify Functions or Netlify Forms** – each would grow that list.
+Netlify, from `main`. The move to Railway is decided in advance rather than deferred: see [ADR-COM-0002](docs/adr/adr-com-0002-astro-static-site.md) for the trigger, the sized work and the named list of Netlify-specific things (the edge function, the `[[headers]]` blocks, the docs-only build skip, deploy previews). **Do not add Netlify Functions or Netlify Forms** – each would grow that list.
 
 ## Versioning and releases
 

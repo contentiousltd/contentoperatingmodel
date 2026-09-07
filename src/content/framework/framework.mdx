@@ -1,0 +1,101 @@
+---
+title: The content operating model
+metaTitle: The content operating model – an open framework from Contentious
+description: A designed, written-down account of how your organisation decides, produces, maintains and retires content. The three layers, the seven questions, and the two registers.
+---
+import Band from '@/components/mdx/Band.astro';
+import Layers from '@/components/framework/Layers.astro';
+import Questions from '@/components/framework/Questions.astro';
+import RuleAndCall from '@/components/framework/RuleAndCall.astro';
+import Vocabulary from '@/components/framework/Vocabulary.astro';
+import { CELLS, FRAMEWORK_VERSION } from '@/data/framework';
+
+{/* This file is the canonical page in one register. The data-driven blocks
+    are components rendering src/data/framework.ts; the prose between them is
+    the specification voice. Headings carry hand-set anchors ({#id}) so deep
+    links survive rewording (ADR-COM-0004 §5). The Markdown twin at
+    /framework.md is generated from this same file. */}
+
+<Band>
+
+Every organisation that publishes has a way of doing content. Very few have a model of it. A content operating model is that model made real: a designed, written-down account of how your organisation decides, produces, maintains and retires content, from the beliefs the words rest on to the workflow that ships them on a Tuesday afternoon.
+
+The distinction matters more than it used to, because a new kind of colleague has arrived who cannot learn the way you do things by watching. People absorb an organisation's habits over months of meetings. An AI agent gets what is written down, and nothing else. If your operating model exists only as behaviour, machines can't follow it; and increasingly, neither can anyone else.
+
+## A way of doing content isn't an operating model \{#a-way-is-not-a-model\}
+
+The way is easy to point at. A sign-off ritual adds four days to every page. New ideas get met with "we don't usually do that". One person knows why the pricing page is worded so carefully, and what happened in 2021 when it wasn't. None of this was designed; it accreted, decision by decision, until it hardened into how things get done.
+
+You couldn't call that an operating model. It's chaotic and ad hoc and not really modelled at all. A model is a representation: something that exists outside the heads of the people running it, that a new starter could read, a leadership team could argue with and a team could improve on purpose. If the way your content gets made lives only as behaviour, what you have is habits.
+
+Habits also age badly. They're why the review-everything-annually rule sits in a slide deck somewhere and has never once fired, and why 78 pages of health guidance can stay live while contradicting the policy that changed in the spring.
+
+Which is why "what's our AI strategy?" is the wrong question in most of the rooms it gets asked in. The answer is an operating model. The machines don't remove the need to decide how content gets made; they remove the option of never writing the decisions down.
+
+</Band>
+
+<Band tint>
+
+<p class="c-eyebrow">The structure</p>
+
+## The three layers \{#the-three-layers\}
+
+The model describes three layers of organisational material, stacked.
+
+<Layers />
+
+Content is the only layer the audience sees, which is why organisations over-invest in it and under-invest beneath it. Most content problems that look like writing problems are layer problems: the words are fine, and there is nothing under them.
+
+</Band>
+
+<Band>
+
+<p class="c-eyebrow">The content layer</p>
+
+## The seven questions \{#the-seven-questions\}
+
+A working model answers seven questions about how the layers become published content. Why sits at the centre, and the other six connect to it, because none of them can be answered well until it is.
+
+<Questions />
+
+</Band>
+
+<Band tint>
+
+<p class="c-eyebrow">Two registers</p>
+
+## Every question is answered twice \{#rule-and-call\}
+
+A strategy sets the rule once; an operating model makes the call every time. Rules without calls give you the beautiful strategy deck and the chaotic Tuesdays. Calls without rules give you the opposite organisation: the smooth machine whose workflow hums and whose content nobody can explain the point of.
+
+AI makes this split impossible to ignore, because AI only accelerates one side of it. Ask an agent to draft forty pages and it will make hundreds of calls before lunch. What it cannot do is supply the rules it is making them against.
+
+<RuleAndCall />
+
+Crossing the seven questions with the two registers gives the model its working surface: {CELLS.length} cells, each of them concrete, each auditable. The 1.0 toolkit will provide templates for all of them.
+
+</Band>
+
+<Band>
+
+<p class="c-eyebrow">Vocabulary</p>
+
+## The words, and what they mean \{#vocabulary\}
+
+<Vocabulary />
+
+### Terms deliberately not used \{#terms-not-used\}
+
+<Vocabulary rejected />
+
+</Band>
+
+<Band tint>
+
+<p class="c-eyebrow">Versioning</p>
+
+## Version {FRAMEWORK_VERSION}, and what happens next \{#version\}
+
+This page carries a version number because the framework practises what it preaches. Changes are logged, release by release, in [the changelog](/changelog), and nothing gets called canonical until teams that do not work for us have used it.
+
+</Band>

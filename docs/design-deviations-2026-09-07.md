@@ -8,8 +8,11 @@ usable front door, so from the topbar onward the fixes are local and recorded
 here. Each entry says what the system does, what this site does instead, and
 what Claude Design needs to decide.
 
-Where a fix lives: `src/styles/site.css` unless stated. Everything here is
-scoped to this product and goes when the system answers it.
+Where a fix lives: `src/styles/overrides.css` unless stated, in a block
+tagged with the item's number (`ledger 12`). `npm run check:ledger` fails the
+build if a block has no number or a number has no entry here, so this list
+and the CSS cannot drift (docs/optimisations-2026-09-07.md §4.4). Everything
+here is scoped to this product and goes when the system answers it.
 
 Roadmap: the work is ROAD-1367 (Done); taking this ledger to Claude Design
 and closing its items is ROAD-1368 (Next). The policy is
@@ -94,8 +97,14 @@ and closing its items is ROAD-1368 (Next). The policy is
    `:root` in `site.css`, unlayered so it beats the theme. Body 24px wide /
    22px laptop / 20px phone; hero title 58px; brand and nav 21px. For scale,
    contentious.ltd renders body copy at 36px and its h1 at 115px on the same
-   monitor. This repo's `CLAUDE.md` still says 24px and needs updating if
-   this stays.
+   monitor. This repo's `CLAUDE.md` now says 20px. Later the same day, a
+   phone step: the package's `--text-multiplier` runs 1 / 1.1 / 1.2 from
+   32rem up (`src/styles/typography.css`, library side), so phone and
+   laptop text differ by 10% at most; contentious.ltd carries `×0.9` below
+   32rem and the package's copy does not. `site.css` adds the same step,
+   unlayered. Body copy is then 18 / 20 / 22 / 24px from phone to wide.
+   **For the system:** the 0.9 step exists on ltd and not in the package;
+   one of them is wrong.
    **Decision needed:** COM's density, in `tokens/products.css` where the
    signature block records it, not in a product override.
 
@@ -121,8 +130,11 @@ and closing its items is ROAD-1368 (Next). The policy is
     `.c-hero { grid-template-columns: 1fr }` let the title's longest word
     ("organisations," at 61.6px, 431px) widen the page to 476px; `site.css`
     makes the track `minmax(0, 1fr)` below 52rem and hyphenates the title.
+    And the title's 3.08u held at every width put the phone heading at 62px
+    over eight lines; below 48rem it is now `--t-title` (2.4u).
     **For the system:** `.c-hero`'s single-column track should be
-    `minmax(0, 1fr)`; a 1fr track floors at the longest word.
+    `minmax(0, 1fr)`; a 1fr track floors at the longest word; and the hero
+    title wants a phone size, not one ratio.
     **Decision needed:** whether `.c-hero`'s own rhythm and title size are
     right, given a sibling front door already departs from them this far.
     Later the same day: the art column went from `1.1fr 1fr` to `1fr 1.25fr`
@@ -159,7 +171,10 @@ and closing its items is ROAD-1368 (Next). The policy is
     library's `--font-size-h2` (2.8em × step, 67px on a wide monitor, 0.91 of
     the 74px h1) to `--t-title` (2.4u, 57.6px, 0.78). For reference,
     contentious.ltd's h2 is 0.71 of its h1 and 2.5× body; Maturity Tool's is
-    0.8 and 2.95× body, using the system's `.type-h2`. h3 size untouched.
+    0.8 and 2.95× body, using the system's `.type-h2`. Later (optimisation
+    audit §1.2): h3 moved from the library's `--font-size-h3` (1.5em × step,
+    36px on a wide monitor) to `--t-section` (30px), so every prose heading
+    is on a role.
     **Decision needed:** which face and size `.prose` headings take across
     the suite; `--font-size-h2` and `.type-h2` and `--t-title` are three
     answers to one question.
@@ -207,6 +222,13 @@ and closing its items is ROAD-1368 (Next). The policy is
     it is the accent (the current `--accent-link` is 750, too dark for it).
     Timing made asymmetric on Julius's call: in over `--duration-slow`
     (500ms), out over 1.6s, the in-transition declared on the hover rule.
+    Text colour, also his call: body links in the accent itself, `--accent`
+    (sapling-700, 5.15:1 on the page ground), hover `--accent-hover`; the
+    system's `--accent-link` is sapling-750. On tinted sections sapling-700
+    measures 4.11:1 against limestone-750, so there links keep the system's
+    `--accent-link` (5.20:1) with `--accent-link-hover` on hover.
+    **For the system:** whether a product's text links take its accent
+    stop or the darker link stop, and the tint ground's contrast budget.
     **Decision needed:** the link hover as a system rule (motion, thickness,
     and whether ltd's 1.5s wants a token above glacial), and one mechanism —
     border or text-decoration — across the suite.
@@ -303,6 +325,60 @@ and closing its items is ROAD-1368 (Next). The policy is
     **Decision needed:** the product's share card, from Claude Design; this
     is a placeholder that stops the 404.
 
+24. **The hero art breaks out of the column at wide widths.** contentious.ltd
+    lets images run past the content column: a `.breakout` utility
+    (`width: 160%; margin-left: -30%`, reset below 768px) for centred
+    figures, and on its COM resource page a right-hand image overhanging the
+    column by a constant 275px from 1600px up. Julius asked for the same on
+    the hero. `site.css`: from 52rem, `.c-hero__art` takes a negative right
+    margin equal to the room between column and viewport minus the gutter,
+    capped at `0.2 × --container-max-width` (216px; an earlier draft of this
+    entry said 0.25, the CSS never did), so the art grows past the column as
+    the viewport allows and never causes a horizontal scroll. The prose
+    figure on the homepage takes the same breakout.
+    **Decision needed:** a breakout rule in the system (ltd has one, the
+    kit has none), and whether the front-door hero art overhangs as a rule.
+
+25. **The topbar wraps.** `.c-topbar` is `nowrap` because it was drawn at the
+    app's 19px; at the front door's size the brand plus links plus a button
+    overflow a narrow viewport. `flex-wrap: wrap` with a half-unit row gap,
+    the same patch the COM reference page's own stylesheet carries. Was
+    listed under "Seen, not changed" without a number; numbered so the CSS
+    can cite it.
+    **Decision needed:** the marketing nav variant the design round already
+    records as a requirement, and what collapses first at narrow widths.
+
+26. **Body text was 17.6px everywhere `.prose` and the roles did not
+    reach.** The package's `base.css` sets `body { font-size: 1.1rem }`,
+    which is 17.6px of the browser's 16px whatever `--base-font-size` says.
+    Measured on `/framework` before the fix: prose paragraphs 22 / 24px,
+    every paragraph, `dd` and `td` in the data sections 17.6px, the layer
+    stack's `h3` 17.6px (the same as body copy), all of `/toolkit` 17.6px.
+    Every "17.6px" in items 9, 10 and 17 is this one cause. Fixed here with
+    `.c-marketing-section { font-size: var(--t-body) }`, and, because the
+    package's `.prose` sets the unscaled base on the block and scales only
+    `p` and `li`, unlayered restatements of `.prose`, `.prose p`, `.prose li`
+    and `.prose .c-eyebrow` on the roles. After: 24 / 22 / 20px body copy on
+    every page and element at wide / laptop / phone.
+    **Fix in the system:** `body` derives from the density tokens
+    (`--t-body`, or `--u`), and `.prose` stops needing its own anchor.
+    Optimisation audit §1.2 and §7.1.
+
+27. **One type scale.** The package ships two: the em-based `type-h1 / h2 /
+    h3 / intro / sm` and `--font-size-h*`, anchored to whatever the element
+    inherits (17.6px, item 26), and the role scale `--u` / `--t-*`, anchored
+    to density. This site used both and they disagreed on one page (prose h2
+    52.8px beside `type-h2` 54.2px at 1440). Now the roles only: `.page-title`
+    is every page's h1 at the hero title's size (item 10) so the front doors
+    match, `.page-lede` is `--t-lede` where `.type-intro` was 1.3em, `.meta`
+    is `--t-hint` where `.type-sm` was a fixed 14px, and no `type-*` class
+    remains in the markup. Breakpoints are written in range syntax
+    (`(width < 48rem)`); 48rem and 52rem are the system's chrome and hero
+    breakpoints and have no published token.
+    **Decision needed:** retire the `type-*` classes or redefine them on
+    `--t-*`; publish the breakpoints as named values. Optimisation audit
+    §4.1, §4.2 and §7.2, §7.7.
+
 ## Removed, on Julius's call
 
 - The tinted "The shape of it" section on the homepage (three layers, seven
@@ -312,7 +388,6 @@ and closing its items is ROAD-1368 (Next). The policy is
 
 ## Seen, not changed
 
-- **Marketing nav variant.** Still open in the system; `.c-topbar`'s
-  `flex-wrap` patch stays.
-- **Astro dev toolbar.** The dark pill at the foot of every dev page. Not in
-  the build; can be switched off in `astro.config.mjs` if it grates.
+- **Marketing nav variant.** Still open in the system; now item 25.
+- **Astro dev toolbar.** Switched off in `astro.config.mjs` (optimisation
+  audit §3.4).

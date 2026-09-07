@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
-import { twins } from '../lib/markdown-twins';
-import { FRAMEWORK_VERSION } from '../data/framework';
+import { FAMILY, SITE_NAME, SITE_URL } from '@/config/site';
+import { FRAMEWORK_VERSION } from '@/data/framework';
+import { twins } from '@/lib/markdown-twins';
 
 /**
  * /llms.txt – the map (see llmstxt.org). Points at the Markdown twins rather
@@ -8,10 +9,10 @@ import { FRAMEWORK_VERSION } from '../data/framework';
  * layout. Generated, so it cannot drift from what the site actually publishes.
  */
 export const GET: APIRoute = async ({ site }) => {
-  const base = (site?.href ?? 'https://contentoperatingmodel.com/').replace(/\/$/, '');
+  const base = (site?.href ?? `${SITE_URL}/`).replace(/\/$/, '');
   const all = await twins(base);
 
-  const body = `# Content Operating Model
+  const body = `# ${SITE_NAME}
 
 > An open framework for how a content function is designed, run and maintained in the AI era. Three layers, seven questions, and two registers: the rule set once and the call made every time. Currently at version ${FRAMEWORK_VERSION}, from Contentious.
 
@@ -27,10 +28,7 @@ ${all.map((twin) => `- [${twin.title}](${base}/${twin.path}): ${twin.description
 
 ## Elsewhere
 
-- [Contentious](https://contentious.ltd): the content strategy practice behind this framework.
-- [Content Maturity](https://contentmaturity.com): measures the system that produces an organisation's content.
-- [Content Health Check](https://contenthealthcheck.com): scores the content itself.
-- [Voice, Tone & Style](https://voicetoneandstyle.com): the style guide humans and machines both read.
+${[...FAMILY].reverse().map((site) => `- [${site.label}](${site.href}): ${site.description}.`).join('\n')}
 `;
 
   return new Response(body, {
