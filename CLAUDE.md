@@ -35,7 +35,7 @@ The framework's own version (`FRAMEWORK_VERSION`, 0.9 today) is **content** and 
 ## Typography
 
 - Headings use `font-display` (Bely Display) and are **never bold** – it has inherent display weight.
-- Base font size is `var(--base-font-size)`, **24px**, because every surface this product owns today is a front door. Density is derived from deployment mode, not chosen. When the app arrives it takes 19px, and that is a property of those surfaces, not a change here.
+- Base font size is `var(--base-font-size)`, **20px**, set in `src/styles/site.css` over the theme's 24px: the brand's marketing value read as too big on a large monitor (28.8px body copy at the top responsive step), and 20px gives 24px there, 22px on a laptop, 20px on a phone. Density is derived from deployment mode, not chosen. When the app arrives it takes 19px, and that is a property of those surfaces, not a change here. The override is recorded in `docs/design-deviations-2026-09-07.md` (item 8) for the signature block to settle.
 - Component styling comes from the design system's `c-*` classes. `src/styles/site.css` is for page layout only.
 
 ## Machine door

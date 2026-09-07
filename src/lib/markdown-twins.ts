@@ -88,8 +88,9 @@ export async function twins(siteUrl: string): Promise<Twin[]> {
           canonical: `${base}/`,
         }),
         '',
-        `# ${home.data.title}`,
+        `# ${home.data.heading ?? home.data.title}`,
         '',
+        ...(home.data.intro ? [home.data.intro, ''] : []),
         home.body ?? '',
       ].join('\n'),
     });

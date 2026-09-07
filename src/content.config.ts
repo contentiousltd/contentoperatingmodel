@@ -17,6 +17,14 @@ const pages = defineCollection({
     metaTitle: z.string().optional(),
     /** 150-160 characters. The postbuild validator fails a page without one. */
     description: z.string(),
+    /** The hero, when a page has one. The eyebrow above the heading. */
+    eyebrow: z.string().optional(),
+    /** The page's H1. Falls back to title. The Markdown twin uses the same. */
+    heading: z.string().optional(),
+    /** The lede under the heading. */
+    intro: z.string().optional(),
+    /** The hero's call to action. */
+    cta: z.object({ label: z.string(), href: z.string() }).optional(),
     /** Ordering within the toolkit journey. Absent for standalone pages. */
     order: z.number().optional(),
     draft: z.boolean().default(false),

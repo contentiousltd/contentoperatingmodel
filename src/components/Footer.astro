@@ -2,32 +2,45 @@
 // Descriptive cross-links to the family, as the June SEO audit asked of every
 // sibling site. Anchor text says what the thing is, not "click here".
 const year = new Date().getFullYear();
+// astro:assets, as contentious.ltd. The mark renders at 4.8u, 96-116px.
+import { Image } from 'astro:assets';
+import apparatus from '../assets/com-apparatus.png';
 ---
-<footer class="c-footer">
-  <div class="c-footer__inner">
-    <div class="c-footer__brand">
-      <img src="/images/com-apparatus.png" alt="" width="29" height="29" />
-      <p class="display-heading">Content Operating Model</p>
-      <p>An open framework from <a href="https://contentious.ltd">Contentious</a>, the content strategy practice.</p>
+<footer class="c-marketing c-footer" data-surface="inverse">
+  <div class="c-footer__in">
+    {/* Mark as its own block beside the name and description, as
+        voicetoneandstyle.com's footer, rather than inline with the wordmark
+        at the system's 29px. See docs/design-deviations-2026-09-07.md 18. */}
+    <div class="footer-brand">
+      <Image src={apparatus} alt="" widths={[120, 240, 360]} sizes="(max-width: 48rem) 96px, 116px" loading="lazy" decoding="async" />
+      <div>
+        <p class="c-footer__brand">Content Operating Model</p>
+        <p>An open framework from <a href="https://contentious.ltd">Contentious</a>, the content strategy practice.</p>
+      </div>
     </div>
-    <nav class="c-footer__links" aria-label="Contentious products">
-      <h2 class="display-heading">Elsewhere</h2>
-      <ul>
-        <li><a href="https://contentmaturity.com">Content maturity assessment</a></li>
-        <li><a href="https://contenthealthcheck.com">Content audit tool</a></li>
-        <li><a href="https://voicetoneandstyle.com">Voice, tone and style guide</a></li>
-        <li><a href="https://contentious.ltd">Contentious</a></li>
-      </ul>
-    </nav>
-    <nav class="c-footer__links" aria-label="This site">
-      <h2 class="display-heading">This site</h2>
-      <ul>
-        <li><a href="/framework">The framework</a></li>
-        <li><a href="/toolkit">The toolkit</a></li>
-        <li><a href="/changelog">Changelog</a></li>
-        <li><a href="/llms.txt">llms.txt</a></li>
-      </ul>
-    </nav>
+    <div class="c-footer__groups">
+      <nav class="c-footer__group" aria-label="Contentious products">
+        <h4>Elsewhere</h4>
+        <div class="c-footer__links">
+          <a href="https://contentmaturity.com">Content maturity assessment</a>
+          <a href="https://contenthealthcheck.com">Content audit tool</a>
+          <a href="https://voicetoneandstyle.com">Voice, tone and style guide</a>
+          <a href="https://contentious.ltd">Contentious</a>
+        </div>
+      </nav>
+      <nav class="c-footer__group" aria-label="This site">
+        <h4>This site</h4>
+        <div class="c-footer__links">
+          <a href="/framework">The framework</a>
+          <a href="/toolkit">The toolkit</a>
+          <a href="/changelog">Changelog</a>
+          <a href="/llms.txt">llms.txt</a>
+        </div>
+      </nav>
+    </div>
   </div>
-  <p class="c-footer__legal">&copy; {year} Contentious Ltd. The framework is free and stays free.</p>
+  {/* A div, not a p, as in the reference page: .c-footer p sets margin and a
+      46ch measure at higher specificity than .c-footer__legal, which would
+      leave the legal line left-stuck and narrow. */}
+  <div class="c-footer__legal">&copy; {year} Contentious Ltd. The framework is free and stays free.</div>
 </footer>

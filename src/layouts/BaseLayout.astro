@@ -3,6 +3,12 @@ import '../styles/index.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { buildJsonLd } from '../lib/structured-data';
+// The design system's base.css declares @font-face against the package's own
+// font files, which Vite hashes into /_astro/. Preloading COM's public/fonts
+// copies preloaded files the CSS never used. These resolve to the same asset
+// the CSS references, in dev and in the build.
+import belyDisplayUrl from '@contentious/ui/fonts/BelyDisplay-Regular.woff2?url';
+import belyRegularUrl from '@contentious/ui/fonts/Bely-Regular.woff2?url';
 
 interface Props {
   title: string;
@@ -64,8 +70,8 @@ const structuredData = buildJsonLd(Astro.site?.href ?? 'https://contentoperating
   <link rel="icon" type="image/png" href="/images/favicon-32.png" sizes="32x32" />
   <link rel="apple-touch-icon" href="/images/apple-touch-icon.png" />
 
-  <link rel="preload" href="/fonts/BelyDisplay-Regular.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="preload" href="/fonts/Bely-Regular.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href={belyDisplayUrl} as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href={belyRegularUrl} as="font" type="font/woff2" crossorigin />
 
   <link rel="alternate" type="application/rss+xml" title="Content Operating Model releases" href="/rss.xml" />
 </head>
