@@ -165,20 +165,27 @@ const current = (href: string) => (path === href ? 'page' : undefined);
   // at the swap put most of it behind the browser's snapshot of the old
   // page, which read as a flash.
   document.addEventListener('astro:before-swap', (e) => {
+    const transition = (e as unknown as { viewTransition?: { finished: Promise<void> } }).viewTransition;
+    const finished = transition?.finished ?? Promise.resolve();
+    // The current-page underline moves only once the crossfade has ended:
+    // the browser paints its snapshot of the old page through the crossfade,
+    // which holds the old underline solid, so a fade started at the swap
+    // was mostly over before it could be seen and read as a vanish.
+    finished.then(markCurrent);
     const { menu } = find();
     if (!menu?.open) return;
-    const transition = (e as unknown as { viewTransition?: { finished: Promise<void> } }).viewTransition;
-    (transition?.finished ?? Promise.resolve()).then(() => {
+    finished.then(() => {
       // The persisted dialog was re-inserted and may have no committed
       // style to fade from; reading one commits it, so the close transitions.
       getComputedStyle(menu).opacity;
       close();
     });
   });
-  // The nav persists across pages, so the current page is re-marked here;
-  // the links were just re-inserted with the nav and have no committed
-  // style to transition from, so one is read first and the underline
-  // then fades between links.
+  // The nav persists across pages, so the current page is re-marked by
+  // script, after the crossfade (see astro:before-swap below); the links
+  // were re-inserted with the nav and may have no committed style to
+  // transition from, so one is read first and the underline then fades
+  // between links.
   const markCurrent = () => {
     const path = location.pathname.replace(/\/+$/, '') || '/';
     const links = document.querySelectorAll<HTMLAnchorElement>('.c-topbar__right a');
@@ -190,10 +197,7 @@ const current = (href: string) => (path === href ? 'page' : undefined);
   };
   // The router swaps the root element's attributes with the page, taking
   // --dpx with them; redraw before the new page paints.
-  document.addEventListener('astro:after-swap', () => {
-    draw();
-    markCurrent();
-  });
+  document.addEventListener('astro:after-swap', draw);
   addEventListener('resize', draw);
   // show() is not modal, so Escape is ours to handle.
   document.addEventListener('keydown', (e) => {
