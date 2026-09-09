@@ -42,6 +42,21 @@
     margin: calc(var(--u) * 2.6) 0 var(--u) calc(var(--u) * 1.5);
   }
 
+  /* A figure that opens the column has no paragraph margin under it, so it
+     takes that margin back (1u; measured 22px high at 1440 and 24px at 2192
+     without it). */
+  @media (width >= 48rem) {
+    .prose-figure:first-child {
+      margin-top: calc(var(--u) * 3.6);
+    }
+  }
+
+  /* The same figure on the left: the copy wraps against its right edge. */
+  .prose-figure--left {
+    float: left;
+    margin: calc(var(--u) * 2.6) calc(var(--u) * 1.5) var(--u) 0;
+  }
+
   /* The prose column contains its own float. */
   .prose .c-section__inner {
     display: flow-root;
