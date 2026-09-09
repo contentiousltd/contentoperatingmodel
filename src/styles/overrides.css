@@ -220,12 +220,12 @@ body {
      ledger 15). A step in tone was tried first and read too quiet. The
      underline is the same box-shadow bar as the text links', so it paints
      outside the box and nothing moves; it fades in over --motion-overlay
-     (350ms, ease-out) and out over --duration-glacial (800ms), in fast
-     and out slow as the text links are, because it also moves from one
+     (350ms, ease-out) and out over --duration-slow (500ms), in fast and
+     out slower as the text links are, because it also moves from one
      link to the next on a page transition: the new one is marked at the
      swap and has to show through the tail of the crossfade, the old one
      is cleared after it (one 800ms both ways read as a delayed fade in;
-     one 350ms both ways as too quick an exit):
+     one 350ms both ways as too quick an exit; 800ms out as a touch slow):
      the nav persists across pages and the header script re-marks the
      current link after the swap, so the old underline fades out as the
      new one fades in. The links rest on --text-body, not the package's
@@ -237,7 +237,7 @@ body {
     color: var(--text-body);
     text-decoration: none;
     box-shadow: 0 0 0 0 transparent;
-    transition: box-shadow var(--duration-glacial) var(--ease-in-out),
+    transition: box-shadow var(--duration-slow) var(--ease-in-out),
                 color var(--motion-state);
   }
 

@@ -517,9 +517,10 @@ and closing its items is ROAD-1368 (Next). The policy is
     COM green that reads as green; at 21px large text it is well past
     AA's 3:1. The
     underline fades in over `--motion-overlay` (350ms, ease-out) and out
-    over `--duration-glacial` (800ms), in fast and out slow as the text
+    over `--duration-slow` (500ms), in fast and out slower as the text
     links are, because it also travels (one 800ms both ways read as a
-    delayed fade in, one 350ms both ways as too quick an exit): the nav
+    delayed fade in, one 350ms both ways as too quick an exit, and 800ms
+    out as a touch slow): the nav
     carries `transition:persist` (it is identical on every page) and the
     header script marks the new page's link at the swap, so its underline
     starts fading in at once (the live new page shows under the crossfade),
