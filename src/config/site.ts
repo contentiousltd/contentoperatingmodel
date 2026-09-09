@@ -20,13 +20,16 @@ export interface NavItem {
   label: string;
 }
 
-/** Main navigation, in order. The header, the mobile menu and the footer's
- *  "This site" group render this list. */
+/** Main navigation, in order. The header and the mobile menu render this
+ *  list; the footer's "Here" group renders FOOTER_NAV, which adds Changelog. */
 export const NAV: readonly NavItem[] = [
-  { href: '/framework', label: 'The framework' },
-  { href: '/toolkit', label: 'The toolkit' },
-  { href: '/changelog', label: 'Changelog' },
+  { href: '/', label: 'Introduction' },
+  { href: '/framework', label: 'Framework' },
+  { href: '/toolkit', label: 'Toolkit' },
 ];
+
+/** Footer's "Here" group: NAV plus Changelog, which stays out of the header. */
+export const FOOTER_NAV: readonly NavItem[] = [...NAV, { href: '/changelog', label: 'Changelog' }];
 
 /** The sibling products, as the June SEO audit asked of every family site:
  *  descriptive anchors, and the same list in the footer and in llms.txt. */

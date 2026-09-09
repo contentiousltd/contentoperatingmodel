@@ -10,6 +10,24 @@ Developer-facing changes to this site. Follows [Keep a Changelog](https://keepac
 
 Ships as 0.2.0: new pages, features and checks (MINOR). Two pieces of work, both on 7 September 2026.
 
+### The navigation, 9 September
+
+Ledger items 30 to 33 in [docs/design-deviations-2026-09-07.md](docs/design-deviations-2026-09-07.md) carry the reasoning and the measurements; this is the summary.
+
+#### Added
+
+- **Client-side navigation** with Astro's `<ClientRouter />` in `BaseLayout.astro`: the router fetches the next page, swaps the document and animates the change with the View Transitions API, on top of the hover prefetch already in place. The header's script looks its elements up per page and wires them on `astro:page-load`, since a bundled script runs once per session under the router while the header is replaced on every navigation; `astro:after-swap` restores `--dpx`, which the swap drops with the root element's attributes.
+- **The mobile nav ported from contentious.ltd, value for value** (ledger 30): one fixed burger outside the sticky header (a stacking context nothing inside it can rise above), morphing into the close; the overlay at 97% of the accent with the page cream on it; links at `--t-metric` fading to 0.8 on hover; the fade in and out on a class toggled a frame after `show()`, since `@starting-style` never parsed as a rule in this dialog's cascade. Opacity 0.7 on the control, and its placement (centred in the bar, the box 32px from the edge) set by eye.
+- **The burger drawn on the device-pixel grid.** Chrome snaps every CSS box to whole CSS pixels before scaling, so three identical 2.5px spans rendered 6, 4 and 4 device rows at 2x and read as three thicknesses at any zoom; SVG rects at fractional coordinates anti-alias unevenly too. The icon is an inline SVG whose coordinate unit is one device pixel, with the rects on integer coordinates, sized by the script from `devicePixelRatio` (again on zoom): identical at 1, 1.6, 2, 2.2 and 3.2x. 25 x 2.5px lines 5.5px apart, a tenth under ltd's.
+- **The menu fades out over the destination.** A tap on a link keeps the dialog through the page swap (`transition:persist`) and closes it once the view transition's `finished` promise resolves, so the overlay hides the crossfade and dissolves to reveal the new page; `astro:page-load` fires before the crossfade, so it is not the cue. Focus returns to the burger only after a keyboard close, because Safari draws its ring on any focus set by script; keyboard focus on the burger and the links takes the system's ring.
+- **The larger bar** (ledger 32): `1u` padding, a `2.5u` mark (ltd's 60px monogram at the marketing base) with half a unit of right margin, the wordmark at `--t-lede` from 48rem; `scroll-padding-top` keeps anchor targets clear of it. A bar that shrank on scroll, as ltd's does, with an eased landing after a page transition, was built and dropped the same day; the code and every measurement are in [docs/plans/shrinking-nav-2026-09-09.md](docs/plans/shrinking-nav-2026-09-09.md) for reinstating.
+- **The current page marked with the underline, hover in colour** (ledger 33), as ltd: the sapling underline the text links share sits under the current page's link; hover and focus fade the text to sapling-650. The nav persists across pages and the script re-marks the current link after each swap, so the underline fades from one link to the next over `--duration-glacial`. A step in tone was tried first and read too quiet.
+
+#### Changed
+
+- **The navigation is Introduction, Framework, Toolkit** (`NAV` in `src/config/site.ts`); Changelog moves to the footer's "Here" group, which renders `FOOTER_NAV`, and the footer's `llms.txt` link goes.
+- The header mark is requested at 64px so the 2x source covers the larger mark (ledger 31 corrects the package's one-axis sizing that cropped it).
+
 ### The optimisation audit, later the same day
 
 Everything in [docs/optimisations-2026-09-07.md](docs/optimisations-2026-09-07.md), applied; section numbers below refer to it. Sizes were measured before and after with `npm run measure` (ADR-COM-0005).

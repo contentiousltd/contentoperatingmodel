@@ -18,32 +18,44 @@ const current = (href: string) => (path === href ? 'page' : undefined);
 ---
 <header class="c-marketing c-topbar">
   <a class="c-topbar__brand display-heading" href="/">
-    <Image src={mark} alt="" width={40} height={40} layout="fixed" loading="eager" />
+    <Image src={mark} alt="" width={64} height={64} layout="fixed" loading="eager" />
     <span>{SITE_NAME}</span>
   </a>
-  <nav class="c-topbar__right" aria-label="Main">
+  {/* transition:persist: the nav is the same on every page, and keeping the
+      element lets the current-page underline fade from one link to the
+      next on a page transition (ledger 33); the script re-marks it. */}
+  <nav class="c-topbar__right" aria-label="Main" transition:persist>
     {NAV.map((link) => (
       <a href={link.href} aria-current={current(link.href)}>{link.label}</a>
     ))}
   </nav>
-  <button class="c-topbar__menu site-control" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="site-menu" data-menu-open>
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
-      <path d="M4 6h16M4 12h16M4 18h16" />
-    </svg>
-  </button>
 </header>
 
-{/* Full-screen mobile nav, as contentious.ltd and contentmaturity.com, on
-    Julius's call over the design system's sheet (ledger item 20). A native
-    <dialog>: showModal() gives the focus trap, Escape, the top layer and
-    inertness of the page behind it, so the script only has to open, close
-    and mirror the state onto the trigger. */}
-<dialog class="c-marketing site-menu" id="site-menu" aria-label="Menu">
-  <button class="site-menu__x site-control" type="button" aria-label="Close menu" data-menu-close>
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
-      <path d="M6 6l12 12M18 6L6 18" />
-    </svg>
-  </button>
+{/* Full-screen mobile nav, ported from contentious.ltd (ledger items 20 and
+    30). One fixed button outside the sticky header: the header is a stacking
+    context, so a burger inside it could never sit above the overlay. It
+    morphs into the close, as ltd's does. The dialog opens with show(), not
+    showModal(): the top layer would cover the button, so the script handles
+    Escape and focus itself. */}
+{/* The icon's coordinate unit is one device pixel: the script sets the
+    viewBox and rects from devicePixelRatio (these attributes are the 2x
+    values, for the frame before it runs). Chrome snaps CSS boxes to whole
+    CSS pixels before scaling, so three identical spans could render at
+    three thicknesses at any zoom; rects on an integer device grid cannot. */}
+<button class="site-burger" type="button" aria-label="Menu" aria-expanded="false" aria-controls="site-menu" data-menu-toggle>
+  <svg class="site-burger__icon" viewBox="0 0 88 88" width="44" height="44" aria-hidden="true">
+    <rect class="site-burger__line" x="20" y="25" width="48" height="5" rx="2.5" />
+    <rect class="site-burger__line" x="20" y="42" width="48" height="5" rx="2.5" />
+    <rect class="site-burger__line" x="20" y="59" width="48" height="5" rx="2.5" />
+  </svg>
+</button>
+
+{/* transition:persist: a tap on a link keeps the menu through the page
+    swap and it fades out over the destination once that has landed,
+    rather than vanishing in the crossfade (the fade needs 300ms, the swap
+    takes about 100). Its listeners are bound once, since the element lives
+    on; the trigger is swapped with each page and rebound in init(). */}
+<dialog class="c-marketing site-menu" id="site-menu" aria-label="Menu" tabindex="-1" transition:persist>
   <nav class="site-menu__links" aria-label="Site">
     {NAV.map((link, n) => (
       <a class="site-menu__link" href={link.href} style={`--i: ${n}`} aria-current={current(link.href)}>{link.label}</a>
@@ -52,29 +64,148 @@ const current = (href: string) => (path === href ? 'page' : undefined);
 </dialog>
 
 <script>
-  const trigger = document.querySelector<HTMLButtonElement>('[data-menu-open]');
-  const menu = document.getElementById('site-menu') as HTMLDialogElement | null;
-  if (trigger && menu) {
-    const reflect = (open: boolean) => {
-      trigger.setAttribute('aria-expanded', String(open));
-      document.body.classList.toggle('has-menu-open', open);
-    };
-    trigger.addEventListener('click', () => {
-      menu.showModal();
-      reflect(true);
+  // The ClientRouter runs this module once per session and swaps the header
+  // on every navigation, so nothing here keeps a handle on an element across
+  // pages: find() looks the chrome up when it is needed, init() wires the
+  // new page's elements on astro:page-load (which also fires on first load),
+  // and the listeners on window, document and matchMedia register once.
+  const find = () => ({
+    trigger: document.querySelector<HTMLButtonElement>('[data-menu-toggle]'),
+    menu: document.getElementById('site-menu') as HTMLDialogElement | null,
+    icon: document.querySelector<SVGSVGElement>('.site-burger__icon'),
+    bar: document.querySelector<HTMLElement>('.c-topbar'),
+  });
+  // Draw the burger on the device-pixel grid (ledger 30 in overrides.css):
+  // a 44px box with 25 x 2.5px lines 5.5px apart, a tenth under
+  // contentious.ltd's 28 x 3 on 6 (which read larger here, by Julius's
+  // eye). Each value is rounded to whole device pixels and laid out in an
+  // SVG whose unit is one device pixel. --dpx lets the button's own
+  // offset snap the same way. Zoom fires resize.
+  const draw = () => {
+    const { trigger, icon, bar } = find();
+    const d = devicePixelRatio;
+    document.documentElement.style.setProperty('--dpx', `${1 / d}px`);
+    if (!icon || !trigger) return;
+    const box = Math.round(44 * d);
+    const line = Math.round(2.5 * d);
+    const gap = Math.round(5.5 * d);
+    const width = Math.round(25 * d);
+    const pitch = line + gap;
+    const inset = Math.round((box - width) / 2);
+    const top = Math.round(box / 2) - Math.floor(line / 2);
+    icon.setAttribute('viewBox', `0 0 ${box} ${box}`);
+    icon.style.width = icon.style.height = `${box / d}px`;
+    icon.style.setProperty('--shift', `${pitch}px`);
+    icon.querySelectorAll('rect').forEach((rect, i) => {
+      rect.setAttribute('x', String(inset));
+      rect.setAttribute('y', String(top + (i - 1) * pitch));
+      rect.setAttribute('width', String(width));
+      rect.setAttribute('height', String(line));
+      rect.setAttribute('rx', String(line / 2));
     });
-    menu.querySelectorAll<HTMLElement>('[data-menu-close], .site-menu__link').forEach((el) =>
-      el.addEventListener('click', () => menu.close()),
-    );
-    // Fires for close(), Escape and a link click alike.
-    menu.addEventListener('close', () => {
-      reflect(false);
-      trigger.focus();
+    // The ink is centred in the bar; the 44px box sits 32px from the right
+    // edge, which Julius set in devtools by eye once the bar grew (the ink
+    // lands about 42px in, on the gutter). All on whole device pixels.
+    if (bar) {
+      const margin = Math.round((bar.offsetHeight * d - (2 * pitch + line)) / 2);
+      trigger.style.top = `${(margin - (top - pitch)) / d}px`;
+      trigger.style.right = `${Math.round(32 * d) / d}px`;
+    }
+  };
+  let returnFocus = false;
+  const close = () => {
+    const { menu } = find();
+    if (!menu) return;
+    menu.classList.remove('is-open');
+    // The fade plays out before the dialog leaves the page.
+    setTimeout(() => menu.close(), 300);
+  };
+  const reflect = (open: boolean) => {
+    find().trigger?.setAttribute('aria-expanded', String(open));
+    document.body.classList.toggle('has-menu-open', open);
+  };
+  const open = () => {
+    const { menu } = find();
+    if (!menu) return;
+    menu.show();
+    // is-open drives the fade. Added in the same tick as show() the
+    // browser has nothing to transition from, so it waits a frame.
+    requestAnimationFrame(() => menu.classList.add('is-open'));
+    reflect(true);
+    // Focus the dialog, not the first link: iOS Safari draws its focus
+    // ring on a link focused by script.
+    menu.focus({ preventScroll: true });
+  };
+  const init = () => {
+    draw();
+    const { trigger, menu } = find();
+    if (!trigger || !menu) return;
+    trigger.addEventListener('click', () => (menu.open ? close() : open()));
+    // The dialog persists across pages (transition:persist), so its own
+    // listeners are bound once. A link tap does not close it: the menu
+    // rides through the swap and afterSwap() fades it out over the new
+    // page.
+    if (!menu.dataset.wired) {
+      menu.dataset.wired = 'true';
+      menu.addEventListener('close', () => {
+        reflect(false);
+        // Focus returns to the burger only after a keyboard close: Safari
+        // draws its own ring on any focus set by script, so a tap on the
+        // X or a link must not hand focus anywhere.
+        if (returnFocus) find().trigger?.focus({ preventScroll: true });
+        returnFocus = false;
+      });
+    }
+  };
+  document.addEventListener('astro:page-load', init);
+  // A menu still open at the swap was navigated from. It rides through the
+  // page crossfade solid (hiding it) and fades out over the new page once
+  // the crossfade has finished: astro:page-load fires before that, so the
+  // view transition's own finished promise is the cue. Starting the fade
+  // at the swap put most of it behind the browser's snapshot of the old
+  // page, which read as a flash.
+  document.addEventListener('astro:before-swap', (e) => {
+    const { menu } = find();
+    if (!menu?.open) return;
+    const transition = (e as unknown as { viewTransition?: { finished: Promise<void> } }).viewTransition;
+    (transition?.finished ?? Promise.resolve()).then(() => {
+      // The persisted dialog was re-inserted and may have no committed
+      // style to fade from; reading one commits it, so the close transitions.
+      getComputedStyle(menu).opacity;
+      close();
     });
-    // If the viewport grows past the chrome breakpoint while the menu is open,
-    // the desktop nav returns and the dialog would sit invisibly on top of it.
-    matchMedia('(width >= 48rem)').addEventListener('change', (e) => {
-      if (e.matches && menu.open) menu.close();
+  });
+  // The nav persists across pages, so the current page is re-marked here;
+  // the links were just re-inserted with the nav and have no committed
+  // style to transition from, so one is read first and the underline
+  // then fades between links.
+  const markCurrent = () => {
+    const path = location.pathname.replace(/\/+$/, '') || '/';
+    const links = document.querySelectorAll<HTMLAnchorElement>('.c-topbar__right a');
+    links.forEach((a) => getComputedStyle(a).boxShadow);
+    links.forEach((a) => {
+      if (a.getAttribute('href') === path) a.setAttribute('aria-current', 'page');
+      else a.removeAttribute('aria-current');
     });
-  }
+  };
+  // The router swaps the root element's attributes with the page, taking
+  // --dpx with them; redraw before the new page paints.
+  document.addEventListener('astro:after-swap', () => {
+    draw();
+    markCurrent();
+  });
+  addEventListener('resize', draw);
+  // show() is not modal, so Escape is ours to handle.
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && find().menu?.open) {
+      returnFocus = true;
+      close();
+    }
+  });
+  // If the viewport grows past the chrome breakpoint while the menu is open,
+  // the desktop nav returns and the dialog would sit invisibly on top of it.
+  matchMedia('(width >= 48rem)').addEventListener('change', (e) => {
+    const { menu } = find();
+    if (e.matches && menu?.open) menu.close();
+  });
 </script>

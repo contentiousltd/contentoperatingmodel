@@ -1,9 +1,9 @@
 ---
 // Descriptive cross-links to the family, as the June SEO audit asked of every
 // sibling site. The lists come from src/config/site.ts, the same source as
-// llms.txt and the header.
+// the header.
 import { Image } from 'astro:assets';
-import { FAMILY, NAV, PUBLISHER, SITE_NAME } from '@/config/site';
+import { FAMILY, FOOTER_NAV, PUBLISHER, SITE_NAME } from '@/config/site';
 // The pale cut of the apparatus, sapling colourway, for the dark ground, as
 // Content Health Check ships clipboard-pale for the same reason; the header
 // keeps the full one. The package's brand set has no pale cut yet
@@ -28,8 +28,7 @@ const year = new Date().getFullYear();
           <nav class="c-footer__group" aria-label="This site">
         <h4>Here</h4>
         <div class="c-footer__links">
-          {NAV.map((link) => <a href={link.href}>{link.label}</a>)}
-          <a href="/llms.txt">llms.txt</a>
+          {FOOTER_NAV.map((link) => <a href={link.href}>{link.label}</a>)}
         </div>
       </nav>
       <nav class="c-footer__group" aria-label="Contentious products">

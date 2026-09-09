@@ -163,6 +163,12 @@ body {
     z-index: var(--z-sticky);
   }
 
+  /* ledger 32: anchor targets land clear of the sticky bar (1u padding
+     each side plus the 2.5u mark, and half a unit of air). */
+  html {
+    scroll-padding-top: calc(var(--u) * 5);
+  }
+
   /* ledger 4: one column, one convention. The library's .c-section__inner is
      an 80rem box with padding INSIDE it, so its text edge is never where the
      design system's chrome column puts the topbar's. This re-points every
@@ -188,12 +194,102 @@ body {
     font-size: var(--t-ui);
   }
 
+  /* ledger 31: the header mark cropped top and bottom. The system's
+     .c-topbar__brand img sets height: 1.67u and nothing else, so width
+     fell back to the <Image> component's fixed width="40" attribute.
+     --u shrinks below 24px at some breakpoints (the phone step is 0.9x),
+     so the box went wider than tall while the mark itself is square,
+     and object-fit: cover cropped the top and bottom to fill it. Both
+     axes off --u, square at every width, as the footer mark (ledger 29). */
+  .c-topbar__brand img {
+    height: calc(var(--u) * 1.67);
+    width: calc(var(--u) * 1.67);
+  }
+
   /* ledger 9: the nav links are bare <a>s in .c-topbar__right and carried no
      type role, so they sat at the reset's 17.6px at every width while
      everything around them scaled. Same role as the brand: one size across
      the header. */
   .c-topbar__right a {
     font-size: var(--t-ui);
+  }
+
+  /* ledger 33: the desktop nav marks the current page with the underline
+     and hovers in colour, as contentious.ltd's does (its underline is
+     sunshine; this is the sapling-500 --underline the text links share,
+     ledger 15). A step in tone was tried first and read too quiet. The
+     underline is the same box-shadow bar as the text links', so it paints
+     outside the box and nothing moves; it fades in and out over
+     --duration-glacial (800ms), one duration both ways rather than the
+     text links' slow in / glacial out, because it also moves from one
+     link to the next on a page transition (350ms read as too quick):
+     the nav persists across pages and the header script re-marks the
+     current link after the swap, so the old underline fades out as the
+     new one fades in. The links rest on --text-body, not the package's
+     link colour (sapling-750, which reads near black), so the hover fade
+     to sapling-650 shows as green: the eyebrow's stop (ledger 28), the
+     one COM green that reads as green, and at 21px large text it is well
+     past AA's 3:1. */
+  .c-topbar__right a {
+    color: var(--text-body);
+    text-decoration: none;
+    box-shadow: 0 0 0 0 transparent;
+    transition: box-shadow var(--duration-glacial) var(--ease-in-out),
+                color var(--motion-state);
+  }
+
+  .c-topbar__right a[aria-current="page"] {
+    box-shadow: 0 calc(var(--u) * 0.2) 0 0 var(--underline);
+  }
+
+  .c-topbar__right a:hover,
+  .c-topbar__right a:focus-visible {
+    text-decoration: none;
+    color: var(--sapling-650);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .c-topbar__right a {
+      transition-duration: var(--duration-fast-exit);
+    }
+  }
+
+  /* ledger 32: the larger bar, a step up from the system's: 1u padding
+     over 0.78u, a 2.5u mark over 1.67u (ltd's 60px monogram at the
+     marketing base), the wordmark at --t-lede over --t-ui from 48rem (it
+     holds at --t-ui below, where it would wrap beside the mark). These
+     were the rest state of a bar that shrank on scroll, as ltd's does,
+     built and dropped on 9 September 2026; docs/plans/shrinking-nav-
+     2026-09-09.md keeps that code and its findings for reinstating. */
+  .c-topbar {
+    padding-block: var(--u);
+  }
+
+  .c-topbar__brand img {
+    height: calc(var(--u) * 2.5);
+    width: calc(var(--u) * 2.5);
+    /* Half a unit of air after the mark on top of the brand's gap, on
+       Julius's call; the footer mark takes a whole unit (ledger 29). */
+    margin-right: calc(var(--u) * 0.5);
+  }
+
+  @media (width >= 48rem) {
+    .c-topbar__brand {
+      font-size: var(--t-lede);
+    }
+  }
+}
+
+/* ---- The eyebrow ------------------------------------------------------ */
+
+@layer components {
+  /* ledger 28: the eyebrow at sapling-650 rather than --accent-link
+     (sapling-750), on Julius's call, so it reads as green rather than near
+     black. 4.05:1 on limestone-600, under AA's 4.5:1 for small text;
+     sapling-700 is the nearest stop that passes (5.15:1). The deep-surface
+     eyebrow in the layer stack keeps --accent-link-on-deep (site.css). */
+  .c-eyebrow {
+    color: var(--sapling-650);
   }
 }
 
@@ -297,6 +393,12 @@ body {
       margin-right: var(--breakout);
       width: calc(36% - var(--breakout));
     }
+
+    /* ledger 24: mirrored for the left-floated figure. */
+    .prose-figure--left {
+      margin-right: calc(var(--u) * 1.5);
+      margin-left: var(--breakout);
+    }
   }
 }
 
@@ -332,9 +434,15 @@ body {
     --underline: var(--accent-link);
   }
 
+  /* ledger 29: the footer text at limestone-750, on Julius's call, dimmer
+     than the system's inverse --text-body (limestone-400). Still 8.84:1 on
+     the footer's gloaming-700 ground, well past AA's 4.5:1. */
+  .c-footer {
+    --text-body: var(--limestone-750);
+  }
+
   .c-marketing-section a:not(.c-button),
-  .c-footer p a,
-  .c-topbar__right a {
+  .c-footer p a {
     text-decoration: none;
     box-shadow: 0 0 0 0 transparent;
     box-decoration-break: clone;
@@ -346,9 +454,7 @@ body {
   .c-marketing-section a:not(.c-button):hover,
   .c-marketing-section a:not(.c-button):focus-visible,
   .c-footer p a:hover,
-  .c-footer p a:focus-visible,
-  .c-topbar__right a:hover,
-  .c-topbar__right a:focus-visible {
+  .c-footer p a:focus-visible {
     text-decoration: none;
     box-shadow: 0 calc(var(--u) * 0.2) 0 0 var(--underline);
     transition: box-shadow var(--duration-slow) var(--ease-in-out),
@@ -357,8 +463,7 @@ body {
 
   @media (prefers-reduced-motion: reduce) {
     .c-marketing-section a:not(.c-button),
-    .c-footer p a,
-    .c-topbar__right a {
+    .c-footer p a {
       transition-duration: var(--duration-fast-exit);
     }
   }
@@ -369,45 +474,109 @@ body {
 @layer components {
   /* ledger 20: full-screen mobile nav, as contentious.ltd and
      contentmaturity.com, on Julius's call over the system's sheet
-     (.c-msheet) and its "never a full-bleed menu page" rule. Limestone on
-     sapling-700: --text-on-accent on --accent. The trigger and the close
-     mirror .c-msheet__x, the one 44px control the system ships; one class
-     for both. Below 48rem the topbar is forced back to one row and the
-     wordmark allowed to wrap beside its mark. */
-  .site-control {
-    width: 44px;
-    height: 44px;
-    display: grid;
-    place-items: center;
+     (.c-msheet) and its "never a full-bleed menu page" rule. Below 48rem
+     the topbar's links go, the topbar is forced back to one row and the
+     wordmark allowed to wrap beside its mark, clear of the burger.
+
+     ledger 30: the whole thing is a port of contentious.ltd's, value for
+     value, with only the colours swapped for COM's signature. Every number
+     here is ltd's: the 97% tint, the 0.8 hover, the marketing transitions.
+     The burger is a tenth under ltd's (28 x 3px lines 6px apart, measured
+     on the live site): 25 x 2.5px lines 5.5px apart at the top of the
+     page (once scaled to 0.85 as the bar shrank, ledger 32), because ltd's
+     numbers read larger here to Julius's eye. One button, fixed and
+     outside the sticky header
+     (a stacking context nothing inside it can escape), sits above the
+     overlay and morphs into the close.
+
+     The icon is drawn on the DEVICE-pixel grid, not in CSS pixels. Chrome
+     snaps every CSS box to whole CSS pixels before scaling, so three
+     identical 2.5px spans rendered 6, 4 and 4 device rows at 2x, and at
+     any zoom the three fell on different fractions of a device pixel and
+     read as three thicknesses. SVG rects at fractional CSS coordinates
+     anti-alias unevenly too. An SVG whose unit IS one device pixel, with
+     rects on integer coordinates, renders the three lines crisp and
+     identical at 1x, 1.6x, 2x, 2.2x and 3.2x (tested). The script in
+     Header.astro sets the viewBox and the rects from devicePixelRatio and
+     --shift (one line pitch, in device pixels) for the morph; --dpx snaps
+     the button's own offset the same way and falls back to a 2x half
+     pixel. Transforms on the rects are in user units, which is why the
+     morph reads --shift rather than a CSS length. The script also places
+     the button: ink centred in the bar, the box 32px from the right edge
+     (ink about 42px in, on the gutter); the
+     top/right here are the pre-script fallback.
+     Opacity 0.7 on the whole control, burger and X alike, on Julius's call
+     (less prominent). */
+  .site-burger {
+    --burger-dpx: var(--dpx, 0.5px);
+    display: none;
+    position: fixed;
+    top: round(calc(var(--u) * 0.78), var(--burger-dpx));
+    right: round(var(--gutter), var(--burger-dpx));
+    z-index: calc(var(--z-modal) + 1);
+    padding: 0;
     border: 0;
     background: transparent;
-    border-radius: var(--radius-control);
     cursor: pointer;
+    line-height: 0;
+    opacity: 0.7;
   }
 
-  .site-control svg {
-    width: calc(var(--u) * 1.1);
-    height: calc(var(--u) * 1.1);
+  .site-burger__icon {
+    display: block;
+    width: 44px;
+    height: 44px;
+    overflow: visible;
   }
 
-  .c-topbar__menu {
-    display: none;
-    margin-left: auto;
-    color: var(--text-secondary);
+  .site-burger__line {
+    fill: var(--text-body);
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: transform var(--marketing-transition-base),
+                opacity var(--marketing-transition-base),
+                fill var(--marketing-transition-base);
   }
 
-  .c-topbar__menu:hover {
-    background: var(--surface-hover);
+  .site-burger:hover .site-burger__line {
+    fill: var(--text-secondary);
   }
+
+  /* Keyboard focus takes the system's ring, on the light bar when closed
+     and on the dark overlay when it is the X; never the browser's blue. */
+  .site-burger:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  .site-burger[aria-expanded="true"]:focus-visible {
+    outline-color: var(--focus-ring-on-dark);
+  }
+
+  .site-burger[aria-expanded="true"] .site-burger__line {
+    fill: var(--surface-page);
+  }
+
+  .site-burger[aria-expanded="true"] .site-burger__line:nth-child(1) {
+    transform: translateY(var(--shift, 17px)) rotate(45deg);
+  }
+
+  .site-burger[aria-expanded="true"] .site-burger__line:nth-child(2) {
+    opacity: 0;
+  }
+
+  .site-burger[aria-expanded="true"] .site-burger__line:nth-child(3) {
+    transform: translateY(calc(-1 * var(--shift, 17px))) rotate(-45deg);
+  }
+
 
   @media (width < 48rem) {
     .c-topbar__right {
       display: none;
     }
 
-    .c-topbar__menu {
-      display: grid;
-      flex: none;
+    .site-burger {
+      display: block;
     }
 
     .c-topbar {
@@ -417,13 +586,24 @@ body {
     .c-topbar__brand {
       white-space: normal;
       min-width: 0;
+      /* Clears the burger: its 44px box sits 32px in, so its left edge is
+         76px from the viewport edge, 36px inside the gutter; 44px leaves
+         8px of air. */
+      padding-right: 44px;
     }
   }
 
   /* ledger 20: the dialog itself. A <dialog> arrives with the UA's margins,
-     border and size caps; reset to the whole viewport on the accent. Open
-     and close animate with @starting-style and allow-discrete, so the fade
-     and the row stagger survive display: none. */
+     border and size caps; reset to the whole viewport.
+
+     ledger 30: ltd's overlay is its band colour at 97%; this is COM's accent
+     at the same 97%, and the text is the page cream on it, as ltd's is its
+     page cream on sunshine (5.15:1 here, past AA for text this size). The
+     system has no tinted-accent token, raised in contentious-ui's GAPS.md.
+     The fade is ltd's technique too: an .is-open class the script adds a
+     frame after show(). @starting-style never parsed as a rule in this
+     dialog's cascade (confirmed with CDP), which is why the menu used to
+     flash. */
   .site-menu {
     position: fixed;
     inset: 0;
@@ -437,24 +617,18 @@ body {
     z-index: var(--z-modal);
     display: none;
     place-items: center;
-    background: var(--accent);
-    color: var(--text-on-accent);
+    background: color-mix(in srgb, var(--accent) 97%, transparent);
+    color: var(--surface-page);
     opacity: 0;
-    transition: opacity var(--motion-exit), display var(--duration-fast-exit) allow-discrete, overlay var(--duration-fast-exit) allow-discrete;
+    transition: opacity var(--marketing-transition-fast);
   }
 
   .site-menu[open] {
     display: grid;
-    opacity: 1;
-    transition: opacity var(--motion-overlay), display var(--duration-medium) allow-discrete, overlay var(--duration-medium) allow-discrete;
-
-    @starting-style {
-      opacity: 0;
-    }
   }
 
-  .site-menu::backdrop {
-    background: transparent;
+  .site-menu.is-open {
+    opacity: 1;
   }
 
   @media (width >= 48rem) {
@@ -464,14 +638,6 @@ body {
     }
   }
 
-  /* The close sits where the burger is in the bar beneath it. */
-  .site-menu__x {
-    position: absolute;
-    top: calc(var(--u) * 0.78);
-    right: var(--gutter);
-    color: var(--text-on-accent);
-  }
-
   .site-menu__links {
     display: flex;
     flex-direction: column;
@@ -479,41 +645,67 @@ body {
     gap: calc(var(--u) * 1.5);
   }
 
-  /* Rows fade and rise 14px, staggered from 110ms 26ms apart: the system's
-     own sheet motion, on a different surface. */
-  .site-menu__link,
-  .site-menu__link:hover,
-  .site-menu__link:focus-visible {
+  /* ltd's links: display face, page cream, hover fades to 0.8 on the fast
+     marketing transition. --t-metric is a size up from --t-section, still a
+     named role. No current-page mark: ltd carries none. */
+  .site-menu__link {
     font-family: var(--font-heading-display);
     font-weight: 400;
-    font-size: var(--t-section);
-    color: var(--text-on-accent);
+    font-size: var(--t-metric);
+    color: var(--surface-page);
     text-decoration: none;
     min-height: 44px;
     display: flex;
     align-items: center;
+    transition: opacity var(--marketing-transition-fast);
   }
 
+  .site-menu__link:hover,
+  .site-menu__link:focus-visible {
+    color: var(--surface-page);
+    text-decoration: none;
+    opacity: 0.8;
+  }
+
+  /* The dialog takes focus on open so no link shows a ring it did not
+     earn; keyboard focus on a link gets the system's ring for a dark
+     ground, never the browser's blue. */
+  .site-menu:focus {
+    outline: none;
+  }
+
+  .site-menu__link:focus-visible {
+    outline: 2px solid var(--focus-ring-on-dark);
+    outline-offset: 2px;
+  }
+
+  /* Rows rise 14px and fade, staggered from 110ms 26ms apart: the system's
+     own sheet motion. .site-menu[open] is the resting state so a row never
+     shows in its raised position before the script adds .is-open. */
   .site-menu[open] .site-menu__link {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity var(--motion-reveal), transform var(--motion-reveal);
+  }
+
+  .site-menu.is-open .site-menu__link {
     opacity: 1;
     transform: none;
-    transition: opacity var(--motion-reveal), transform var(--motion-reveal);
     transition-delay: calc(110ms + var(--i) * 26ms);
-
-    @starting-style {
-      opacity: 0;
-      transform: translateY(14px);
-    }
   }
 
-  .site-menu__link[aria-current="page"] {
-    box-shadow: 0 calc(var(--u) * 0.15) 0 0 var(--text-on-accent);
+  .site-menu.is-open .site-menu__link:hover,
+  .site-menu.is-open .site-menu__link:focus-visible {
+    opacity: 0.8;
+    transition: opacity var(--marketing-transition-fast);
+    transition-delay: 0s;
   }
 
   @media (prefers-reduced-motion: reduce) {
     .site-menu,
-    .site-menu[open],
-    .site-menu[open] .site-menu__link {
+    .site-burger__line,
+    .site-menu[open] .site-menu__link,
+    .site-menu.is-open .site-menu__link {
       transition-duration: 120ms;
       transition-delay: 0s;
       transform: none;
@@ -590,5 +782,12 @@ body {
     width: calc(var(--u) * 4.8);
     flex: none;
     display: block;
+    /* ledger 29: more air between the mark and the name/description than
+       the shared 1u gap gives; the gap stays for the row's own rhythm.
+       Margin, not padding: the base reset's border-box would have let a
+       right padding eat into this square's own width, narrowing the
+       content box object-fit: cover then crops to and clipping the mark
+       left and right against its own frame. */
+    margin-right: var(--u);
   }
 }

@@ -1,5 +1,6 @@
 ---
 import '@/styles/index.css';
+import { ClientRouter } from 'astro:transitions';
 import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
 import { SITE_NAME, SITE_URL } from '@/config/site';
@@ -72,6 +73,11 @@ const structuredData = buildJsonLd(site.href, nodes);
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  {/* Client-side navigation with the browser's View Transitions API: the
+      router fetches the next page, swaps the document and animates the
+      change. Bundled scripts run once per session under it, so anything that
+      wires up page elements listens for astro:page-load (see Header.astro). */}
+  <ClientRouter />
   <title>{pageTitle}</title>
   <meta name="description" content={description} />
   {noindex && <meta name="robots" content="noindex" />}
