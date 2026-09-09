@@ -23,8 +23,11 @@ const current = (href: string) => (path === href ? 'page' : undefined);
   </a>
   {/* transition:persist: the nav is the same on every page, and keeping the
       element lets the current-page underline fade from one link to the
-      next on a page transition (ledger 33); the script re-marks it. */}
-  <nav class="c-topbar__right" aria-label="Main" transition:persist>
+      next on a page transition (ledger 33); the script re-marks it.
+      transition:animate="none" takes the nav out of the page crossfade,
+      whose snapshot of the old page would otherwise cover the old
+      underline's fade, so both underlines move from the swap. */}
+  <nav class="c-topbar__right" aria-label="Main" transition:persist transition:animate="none">
     {NAV.map((link) => (
       <a href={link.href} aria-current={current(link.href)}>{link.label}</a>
     ))}
@@ -167,11 +170,6 @@ const current = (href: string) => (path === href ? 'page' : undefined);
   document.addEventListener('astro:before-swap', (e) => {
     const transition = (e as unknown as { viewTransition?: { finished: Promise<void> } }).viewTransition;
     const finished = transition?.finished ?? Promise.resolve();
-    // The old page's underline goes only once the crossfade has ended: the
-    // browser paints its snapshot of the old page through the crossfade,
-    // which holds that underline solid, so a fade started at the swap was
-    // mostly over before it could be seen and read as a vanish.
-    finished.then(clearFormer);
     const { menu } = find();
     if (!menu?.open) return;
     finished.then(() => {
@@ -186,24 +184,17 @@ const current = (href: string) => (path === href ? 'page' : undefined);
   // were re-inserted with the nav and may have no committed style to
   // transition from, so one is read first and the underline then fades
   // between links.
-  // In two steps: the new page's link is marked at the swap, so its
-  // underline starts fading in at once (the live new page shows under the
-  // crossfade), and the old page's link is cleared only once the
-  // crossfade has ended, so its fade out is not hidden behind the
-  // browser's snapshot of the old page.
-  const navLinks = () => {
-    const path = location.pathname.replace(/\/+$/, '') || '/';
-    const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('.c-topbar__right a'));
-    links.forEach((a) => getComputedStyle(a).boxShadow);
-    return { links, path };
-  };
+  // Both at the swap: the nav is outside the page crossfade (see the
+  // markup), so the old underline's fade out and the new one's fade in are
+  // on screen from the first frame of the new page.
   const markCurrent = () => {
-    const { links, path } = navLinks();
-    links.forEach((a) => { if (a.getAttribute('href') === path) a.setAttribute('aria-current', 'page'); });
-  };
-  const clearFormer = () => {
-    const { links, path } = navLinks();
-    links.forEach((a) => { if (a.getAttribute('href') !== path) a.removeAttribute('aria-current'); });
+    const path = location.pathname.replace(/\/+$/, '') || '/';
+    const links = document.querySelectorAll<HTMLAnchorElement>('.c-topbar__right a');
+    links.forEach((a) => getComputedStyle(a).boxShadow);
+    links.forEach((a) => {
+      if (a.getAttribute('href') === path) a.setAttribute('aria-current', 'page');
+      else a.removeAttribute('aria-current');
+    });
   };
   // The router swaps the root element's attributes with the page, taking
   // --dpx with them; redraw before the new page paints.

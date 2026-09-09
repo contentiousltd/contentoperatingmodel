@@ -522,16 +522,15 @@ and closing its items is ROAD-1368 (Next). The policy is
     delayed fade in, one 350ms both ways as too quick an exit, and 800ms
     out as a touch slow): the nav
     carries `transition:persist` (it is identical on every page) and the
-    header script marks the new page's link at the swap, so its underline
-    starts fading in at once (the live new page shows under the crossfade),
-    and clears the old page's link only once the view transition has
-    finished (its `finished` promise, handed over on `astro:before-swap`),
-    reading a computed style first so the re-inserted links have something
-    to transition from. The old one cannot go at the swap: the browser
-    paints its snapshot of the old page through the crossfade, which holds
-    that underline solid, so a fade started then was mostly over before it
-    could be seen and read as a vanish; and waiting for both read as a
-    delayed fade in.
+    header script re-marks the current link at the swap, reading a computed
+    style first so the re-inserted links have something to transition
+    from. The nav also carries `transition:animate="none"`, which takes it
+    out of the page crossfade: the browser paints its snapshot of the old
+    page through the crossfade, which held the old underline solid so its
+    fade read as a vanish, and waiting for the crossfade to end before
+    moving it read as a delayed fade in. As its own group with no
+    animation, the live nav shows from the swap and both underlines move
+    at once while the rest of the page crossfades.
     **Decision needed:** the marketing nav variant's current-page mark
     (item 25): ltd's underline, now here too, or something else.
 
