@@ -516,18 +516,21 @@ and closing its items is ROAD-1368 (Next). The policy is
     hover and focus fade them to sapling-650, the eyebrow's stop and the one
     COM green that reads as green; at 21px large text it is well past
     AA's 3:1. The
-    underline fades in and out over `--duration-glacial` (800ms; 350ms
-    read as too quick to Julius), one duration both ways rather than the
-    text links' slow in / glacial out, because it also travels: the nav
+    underline fades in over `--motion-overlay` (350ms, ease-out) and out
+    over `--duration-glacial` (800ms), in fast and out slow as the text
+    links are, because it also travels (one 800ms both ways read as a
+    delayed fade in, one 350ms both ways as too quick an exit): the nav
     carries `transition:persist` (it is identical on every page) and the
-    header script re-marks the current link once the view transition has
+    header script marks the new page's link at the swap, so its underline
+    starts fading in at once (the live new page shows under the crossfade),
+    and clears the old page's link only once the view transition has
     finished (its `finished` promise, handed over on `astro:before-swap`),
-    after reading a computed style so the re-inserted links have something
-    to transition from. Not at the swap: the browser paints its snapshot of
-    the old page through the crossfade, which holds the old underline
-    solid, so a fade started then was mostly over before it could be seen
-    and read as a vanish. After the crossfade the old underline fades out
-    as the new one fades in, both in full view.
+    reading a computed style first so the re-inserted links have something
+    to transition from. The old one cannot go at the swap: the browser
+    paints its snapshot of the old page through the crossfade, which holds
+    that underline solid, so a fade started then was mostly over before it
+    could be seen and read as a vanish; and waiting for both read as a
+    delayed fade in.
     **Decision needed:** the marketing nav variant's current-page mark
     (item 25): ltd's underline, now here too, or something else.
 

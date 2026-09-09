@@ -219,10 +219,13 @@ body {
      sunshine; this is the sapling-500 --underline the text links share,
      ledger 15). A step in tone was tried first and read too quiet. The
      underline is the same box-shadow bar as the text links', so it paints
-     outside the box and nothing moves; it fades in and out over
-     --duration-glacial (800ms), one duration both ways rather than the
-     text links' slow in / glacial out, because it also moves from one
-     link to the next on a page transition (350ms read as too quick):
+     outside the box and nothing moves; it fades in over --motion-overlay
+     (350ms, ease-out) and out over --duration-glacial (800ms), in fast
+     and out slow as the text links are, because it also moves from one
+     link to the next on a page transition: the new one is marked at the
+     swap and has to show through the tail of the crossfade, the old one
+     is cleared after it (one 800ms both ways read as a delayed fade in;
+     one 350ms both ways as too quick an exit):
      the nav persists across pages and the header script re-marks the
      current link after the swap, so the old underline fades out as the
      new one fades in. The links rest on --text-body, not the package's
@@ -240,6 +243,7 @@ body {
 
   .c-topbar__right a[aria-current="page"] {
     box-shadow: 0 calc(var(--u) * 0.2) 0 0 var(--underline);
+    transition: box-shadow var(--motion-overlay), color var(--motion-state);
   }
 
   .c-topbar__right a:hover,
