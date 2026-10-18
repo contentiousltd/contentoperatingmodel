@@ -25,16 +25,29 @@ jobs:
           # and the sitemap silently loses the field.
           fetch-depth: 0
           # persist-credentials: false stops actions/checkout writing an
-          # AUTHORIZATION header for github.com into git config. If
-          # @contentious/ui ever goes private, that header would override the
-          # credentials a private-packages step configures. These jobs never
-          # push, so they do not need it.
+          # AUTHORIZATION header for github.com into git config, which would
+          # override the credentials the private-packages step below
+          # configures. These jobs never push, so they do not need it.
           persist-credentials: false
 
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
           cache: npm
+
+      # @contentious/ui is private now (it carries the licensed Bely fonts), so
+      # npm needs the suite's read-only package token to clone it; see the
+      # meta-repo's docs/plans/private-contentious-ui-access.md. Without the
+      # secret this does nothing and npm ci fails loudly on the package.
+      - name: Authenticate for private @contentious packages
+        env:
+          CONTENTIOUS_PACKAGES_TOKEN: ${{ secrets.CONTENTIOUS_PACKAGES_TOKEN }}
+        run: |
+          if [ -n "$CONTENTIOUS_PACKAGES_TOKEN" ]; then
+            for u in "https://github.com/" "ssh://git@github.com/" "git@github.com:"; do
+              git config --global --add url."https://$CONTENTIOUS_PACKAGES_TOKEN@github.com/".insteadOf "$u"
+            done
+          fi
 
       - run: npm ci
 
