@@ -34,6 +34,7 @@ The front door brought to the design system, then past it where the system fell 
 
 ### Fixed
 
+- **CI installs the private design system.** `@contentious/ui` went private (it carries the licensed Bely fonts), so `npm ci` failed before any check ran. The checks job now authenticates with the suite's read-only `CONTENTIOUS_PACKAGES_TOKEN`, as the Lexicon's does (meta-repo `docs/plans/private-contentious-ui-access.md`).
 - The header, hero and footer markup brought to `guidelines/pattern-com-page.html`: `.c-marketing` on the bands, `.c-hero__title` for the invented `.c-hero__heading`, the footer's real class structure, `.c-footer__legal` as a `div` so it centres (6).
 - Buttons that are anchors keep their text colour on hover (14).
 - The footer no longer overflows a phone, nor does the hero title's longest word, nor the topbar's burger onto a second row (21, 10, 20).
