@@ -38,6 +38,7 @@ The front door brought to the design system, then past it where the system fell 
 - Buttons that are anchors keep their text colour on hover (14).
 - The footer no longer overflows a phone, nor does the hero title's longest word, nor the topbar's burger onto a second row (21, 10, 20).
 - `.c-section` no longer applied to the hero: the design system's `.c-section` is the app spacer and painted a strip of page ground under the topbar (10).
+- **The sitemap's `lastmod` follows the content, not the template.** It took the first source file that existed for a route, always the `.astro` page, so an edit to `home.md`, `framework.md`, `src/data/framework.ts` or a release left the date where it was. It is now the newest commit across everything the page renders from.
 
 ### Removed
 
