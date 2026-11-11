@@ -10,6 +10,12 @@ Developer-facing changes to this site. Follows [Keep a Changelog](https://keepac
 
 Ships as 0.2.0: new pages, features and checks (MINOR). Two pieces of work, both on 7 September 2026.
 
+### The design system, 11 November
+
+#### Changed
+
+- **`@contentious/ui` pinned to v0.15.0**, from v0.14.2, so `check:ui-current` passes in CI. The release is additive: `reading.css` is opt-in and unused here, and the built CSS differs only by the two new tokens `--reading-size` and `--reading-measure`, so no rule and no measurement changes. Lockfile regenerated from a fresh install; the Linux native bindings are present.
+
 ### The navigation, 9 September
 
 Ledger items 30 to 33 in [docs/design-deviations-2026-09-07.md](docs/design-deviations-2026-09-07.md) carry the reasoning and the measurements; this is the summary.
