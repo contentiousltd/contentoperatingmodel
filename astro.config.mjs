@@ -33,6 +33,17 @@ export default defineConfig({
   image: {
     layout: 'constrained',
     responsiveStyles: true,
+    // AVIF rather than Astro's default WebP, through the same wrapped sharp
+    // service as contentious.ltd (src/lib/image-service.ts, copied from
+    // contentious-astro, where its reasoning and measurements live): Astro
+    // has no top-level format or quality option, so the service fills in the
+    // defaults. Quality 65 by default; QUALITY.illustration (50) is opted in
+    // per call site for the hero and the apparatus figure, which hold up at
+    // it. The map keeps 65: it is finely drawn, and at 50 it lost 2 dB
+    // against WebP. Measured on 11 November 2026: see CHANGELOG.md.
+    service: {
+      entrypoint: './src/lib/image-service.ts',
+    },
   },
 
   // Four pages, each 2 to 6KB gzipped: prefetch the one under the pointer so

@@ -11,10 +11,12 @@ intro: >-
 cta:
   label: Read the framework
   href: /framework
+heroAlt: A printing press and a person working at a loom, joined by long lines to the letterforms and blocks of colour above them
 ---
 import { Image } from 'astro:assets';
+import { QUALITY } from '@/lib/image-service';
 import apparatus from '@/assets/apparatus-sapling.png';
-import map from '@/assets/map.png';
+import map from '@/assets/map-of-paths.png';
 
 {/* One continuous prose body. Each figure floats beside the heading
     that follows it: the map left, the apparatus right. */}
@@ -37,7 +39,7 @@ But it makes problems we already had much bigger and much more pressing.
 
 It doesn't have to be this way.
 
-<Image src={map} alt="" width={605} class="prose-figure prose-figure--left" />
+<Image src={map} alt="An abstract map in green, yellow and black on blue, with bundles of lines running across it like paths" width={605} class="prose-figure prose-figure--left" />
 
 ## Learning from past mistakes
 
@@ -59,7 +61,7 @@ The reality is more transformational than tactical. AI is a massive challenge an
 
 If we’re going to grab that opportunity we need to stop treating it as a tech-first issue and look at what it enables and what we need to transform in our organisations in order to get there.
 
-<Image src={apparatus} alt="" width={605} class="prose-figure" />
+<Image src={apparatus} alt="A machine of gears, springs, pipes and levers, every part connected to another" width={605} quality={QUALITY.illustration} class="prose-figure" />
 
 ## Devops as inspiration
 

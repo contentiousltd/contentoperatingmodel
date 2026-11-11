@@ -10,6 +10,17 @@ Developer-facing changes to this site. Follows [Keep a Changelog](https://keepac
 
 Ships as 0.2.0: new pages, features and checks (MINOR). Two pieces of work, both on 7 September 2026.
 
+### Images, 11 November
+
+#### Changed
+
+- **AVIF instead of WebP, through contentious.ltd's image service.** `src/lib/image-service.ts` is copied from contentious-astro (Astro has no site-wide format or quality option, so the service fills in AVIF at quality 65), with one change: Astro 7's `validateOptions` takes a third `logger` argument, passed straight through. The hero and the apparatus figure opt into `QUALITY.illustration` (50); the map keeps 65. Across every variant the built pages reference, 2,408 KB of WebP becomes 1,650 KB of AVIF (hero 838 to 484, apparatus 449 to 282, map 1,093 to 862, footer mark 28 to 21). Against the source at 1080px, PSNR: hero 38.0 dB as WebP, 37.7 as AVIF q50; apparatus 39.7 and 40.1; map 34.6 as WebP, 32.5 at q50 and 35.2 at q65, which is why the map stays at 65.
+- **The hero stays `com-2.png`**, Julius's pick over `letterpress-sapling.png`, **renamed `press-and-loom.png`**, and **`map.png` is now `map-of-paths.png`**, so the published file names say what the images show. `com-mark.png` stays: it is the favicon's source (ledger 19).
+
+#### Added
+
+- **Alt text** on the hero (a new `heroAlt` field in the pages schema, so it lives in `home.mdx` rather than the template) and on the two homepage figures. The Markdown twin carries the figures' descriptions as italic lines. The header and footer marks keep `alt=""`: each sits in a link beside the site's name, which already says what it is.
+
 ### The design system, 11 November
 
 #### Changed

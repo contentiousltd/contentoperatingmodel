@@ -26,6 +26,9 @@ const pages = defineCollection({
     intro: z.string().optional(),
     /** The hero's call to action. */
     cta: z.object({ label: z.string(), href: z.string() }).optional(),
+    /** The hero image's alt text, when the page has a hero image. Content,
+        so it lives here rather than in the page template. */
+    heroAlt: z.string().optional(),
     /** Ordering within the toolkit journey. Absent for standalone pages. */
     order: z.number().optional(),
     draft: z.boolean().default(false),
