@@ -1,7 +1,7 @@
 ---
 title: The content operating model
 metaTitle: The content operating model – an open framework from Contentious
-description: A designed, written-down account of how your organisation decides, produces, maintains and retires content. The three layers, the seven questions, and the two registers.
+description: A written-down account of how your organisation decides, makes, maintains and retires content, in three layers, seven questions and two registers.
 ---
 import Band from '@/components/mdx/Band.astro';
 import Layers from '@/components/framework/Layers.astro';
@@ -18,19 +18,19 @@ import { CELLS, FRAMEWORK_VERSION } from '@/data/framework';
 
 <Band>
 
-Every organisation that publishes has a way of doing content. Very few have a model of it. A content operating model is that model made real: a designed, written-down account of how your organisation decides, produces, maintains and retires content, from the beliefs the words rest on to the workflow that ships them on a Tuesday afternoon.
+Every organisation that publishes has a way of doing content. Few have written it down. A content operating model is the written-down version: how your organisation decides what to publish, makes it, keeps it current and retires it, along with the knowledge and beliefs all of that rests on.
 
-The distinction matters more than it used to, because a new kind of colleague has arrived who cannot learn the way you do things by watching. People absorb an organisation's habits over months of meetings. An AI agent gets what is written down, and nothing else. If your operating model exists only as behaviour, machines can't follow it; and increasingly, neither can anyone else.
+That used to be good practice. Now it's necessary, because AI agents can only follow what's written down. People pick up an organisation's habits over months of meetings and conversations in the kitchen. An agent can't. If your way of working lives only in people's heads, an agent has nothing to work from, and the next person you hire doesn't have much more.
 
 ## A way of doing content isn't an operating model \{#a-way-is-not-a-model\}
 
-The way is easy to point at. A sign-off ritual adds four days to every page. New ideas get met with "we don't usually do that". One person knows why the pricing page is worded so carefully, and what happened in 2021 when it wasn't. None of this was designed; it accreted, decision by decision, until it hardened into how things get done.
+The way is usually easy to spot. A sign-off process adds four days to every page. New ideas get "we don't usually do that". One person knows why the pricing page is worded so carefully, and what happened in 2021 when it wasn't. Nobody designed any of this. It built up one decision at a time until it became how things are done.
 
-You couldn't call that an operating model. It's chaotic and ad hoc and not really modelled at all. A model is a representation: something that exists outside the heads of the people running it, that a new starter could read, a leadership team could argue with and a team could improve on purpose. If the way your content gets made lives only as behaviour, what you have is habits.
+That isn't a model. A model exists outside the heads of the people who run it. A new starter can read it, a leadership team can argue with it and a team can change it on purpose. If the way your content gets made exists only as behaviour, what you have is a set of habits.
 
-Habits also age badly. They're why the review-everything-annually rule sits in a slide deck somewhere and has never once fired, and why 78 pages of health guidance can stay live while contradicting the policy that changed in the spring.
+Habits don't update themselves. That's how a rule to review everything once a year can sit in a slide deck and never be followed, and how 78 pages of health guidance can stay live after the policy behind them changed in the spring.
 
-Which is why "what's our AI strategy?" is the wrong question in most of the rooms it gets asked in. The answer is an operating model. The machines don't remove the need to decide how content gets made; they remove the option of never writing the decisions down.
+So when someone asks "what's our AI strategy?", the useful answer is usually an operating model. AI won't decide how your content gets made, but it will only follow the decisions you've written down.
 
 </Band>
 
@@ -40,11 +40,11 @@ Which is why "what's our AI strategy?" is the wrong question in most of the room
 
 ## The three layers \{#the-three-layers\}
 
-The model describes three layers of organisational material, stacked.
+The model has three layers. Two are foundations that belong to the whole organisation, and content sits on top of them.
 
 <Layers />
 
-Content is the only layer the audience sees, which is why organisations over-invest in it and under-invest beneath it. Most content problems that look like writing problems are layer problems: the words are fine, and there is nothing under them.
+The audience only sees the content layer, so that's where most organisations put their money and attention. But a lot of what looks like a writing problem starts further down. The copy is competent; there just isn't a settled body of knowledge or a clear position for it to express.
 
 </Band>
 
@@ -54,7 +54,7 @@ Content is the only layer the audience sees, which is why organisations over-inv
 
 ## The seven questions \{#the-seven-questions\}
 
-A working model answers seven questions about how the layers become published content. Why sits at the centre, and the other six connect to it, because none of them can be answered well until it is.
+A working model answers seven questions about how the foundations become published content. Why sits at the centre. The other six depend on it, and none of them can be answered well until it has been.
 
 <Questions />
 
@@ -66,13 +66,13 @@ A working model answers seven questions about how the layers become published co
 
 ## Every question is answered twice \{#rule-and-call\}
 
-A strategy sets the rule once; an operating model makes the call every time. Rules without calls give you the beautiful strategy deck and the chaotic Tuesdays. Calls without rules give you the opposite organisation: the smooth machine whose workflow hums and whose content nobody can explain the point of.
+Each question needs two answers: a rule, decided once, and a call, made every time the question comes up. Most organisations are better at one than the other. An organisation strong on rules has a well-argued strategy that rarely shows up in the weekly work. One strong on calls has a smooth production line turning out content nobody can explain the purpose of.
 
-AI makes this split impossible to ignore, because AI only accelerates one side of it. Ask an agent to draft forty pages and it will make hundreds of calls before lunch. What it cannot do is supply the rules it is making them against.
+AI widens that gap, because it speeds up the calls and does nothing for the rules. Ask an agent to draft forty pages and it will make hundreds of calls before lunch. It can't tell you what those calls should be measured against.
 
 <RuleAndCall />
 
-Crossing the seven questions with the two registers gives the model its working surface: {CELLS.length} cells, each of them concrete, each auditable. The 1.0 toolkit will provide templates for all of them.
+Set the seven questions against the two registers and you get {CELLS.length} cells, each specific enough to write down and check. The 1.0 toolkit will include a template for every one.
 
 </Band>
 
@@ -96,6 +96,6 @@ Crossing the seven questions with the two registers gives the model its working 
 
 ## Version {FRAMEWORK_VERSION}, and what happens next \{#version\}
 
-This page carries a version number because the framework practises what it preaches. Changes are logged, release by release, in [the changelog](/changelog), and nothing gets called canonical until teams that do not work for us have used it.
+The framework has a version number because it's still changing. Each release is logged in the [changelog](/changelog). We won't call it 1.0 until teams outside Contentious have used it on their own content.
 
 </Band>
