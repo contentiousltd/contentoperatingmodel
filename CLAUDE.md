@@ -54,7 +54,7 @@ Every published page ships with a Markdown twin at the same path (`/framework` â
 npm run lint             # astro check + tsc + prose + tokens + ledger + ui-current
 npm run build            # build, then postbuild validation
 npm run check:ledger     # overrides.css tags â†” the deviations ledger
-npm run check:ui-current # is the pinned @contentious/ui the latest tag?
+npm run check:ui-current # is the pinned @contentious/ui the latest published version?
 npm run measure          # computed sizes at three widths, against npm run preview
 ```
 

@@ -14,6 +14,7 @@ Ships as 0.2.0: new pages, features and checks (MINOR). Two pieces of work, both
 
 #### Changed
 
+- **`@contentious/ui` installs from GitHub Packages**, as `npm:@contentiousltd/ui@0.15.0` aliased to `@contentious/ui`, with a committed `.npmrc` reading `CONTENTIOUS_NPM_TOKEN`, as Content Health Check does (the meta-repo's `docs/plans/package-registry.md`). The package went private in September, so CI's git install had been failing with `Permission denied (publickey)`. `check:ui-current` now compares the pin with the registry's latest published version (`npm view`) instead of the repo's tags. CI and the Netlify site each need the token as `CONTENTIOUS_NPM_TOKEN`.
 - **`@contentious/ui` pinned to v0.15.0**, from v0.14.2, so `check:ui-current` passes in CI. The release is additive: `reading.css` is opt-in and unused here, and the built CSS differs only by the two new tokens `--reading-size` and `--reading-measure`, so no rule and no measurement changes. Lockfile regenerated from a fresh install; the Linux native bindings are present.
 
 ### The navigation, 9 September
