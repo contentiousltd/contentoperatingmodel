@@ -10,10 +10,22 @@ Developer-facing changes to this site. Follows [Keep a Changelog](https://keepac
 
 Ships as 0.2.0: new pages, features and checks (MINOR). Two pieces of work, both on 7 September 2026.
 
+### Images, 11 November
+
+#### Changed
+
+- **AVIF instead of WebP, through contentious.ltd's image service.** `src/lib/image-service.ts` is copied from contentious-astro (Astro has no site-wide format or quality option, so the service fills in AVIF at quality 65), with one change: Astro 7's `validateOptions` takes a third `logger` argument, passed straight through. The apparatus figure opts into `QUALITY.illustration` (50); the hero and the map keep 65, because at 50 they fell below WebP. PSNR against the source at 1080px: hero 40.2 dB as WebP, 38.6 at q50, 40.8 at q65; apparatus 39.7 as WebP, 40.1 at q50; map 34.6 as WebP, 32.5 at q50, 35.2 at q65. Across every variant the built pages reference, the images go from 2,408 KB as WebP to 1,718 KB as AVIF, 29% less (hero 838 to 552, apparatus 449 to 282, map 1,093 to 862, footer mark 28 to 21).
+- **The hero is the recoloured press and loom**, `letterpress-sapling.png` (the recolour tool's output of 11 September: 99% of its opaque pixels exactly on palette shades, against 19% for the 7 September `com-2.png` it replaces), **committed as `press-and-loom.png`**, and **`map.png` is now `map-of-paths.png`**, so the published file names say what the images show. `com-mark.png` stays: it is the favicon's source (ledger 19).
+
+#### Added
+
+- **Alt text** on the hero (a new `heroAlt` field in the pages schema, so it lives in `home.mdx` rather than the template) and on the two homepage figures. The Markdown twin carries the figures' descriptions as italic lines. The header and footer marks keep `alt=""`: each sits in a link beside the site's name, which already says what it is.
+
 ### The design system, 11 November
 
 #### Changed
 
+- **`@contentious/ui` installs from GitHub Packages**, as `npm:@contentiousltd/ui@0.15.0` aliased to `@contentious/ui`, with a committed `.npmrc` reading `CONTENTIOUS_NPM_TOKEN`, as Content Health Check does (the meta-repo's `docs/plans/package-registry.md`). The package went private in September, so CI's git install had been failing with `Permission denied (publickey)`. `check:ui-current` now compares the pin with the registry's latest published version (`npm view`) instead of the repo's tags. CI and the Netlify site each need the token as `CONTENTIOUS_NPM_TOKEN`.
 - **`@contentious/ui` pinned to v0.15.0**, from v0.14.2, so `check:ui-current` passes in CI. The release is additive: `reading.css` is opt-in and unused here, and the built CSS differs only by the two new tokens `--reading-size` and `--reading-measure`, so no rule and no measurement changes. Lockfile regenerated from a fresh install; the Linux native bindings are present.
 
 ### The navigation, 9 September
