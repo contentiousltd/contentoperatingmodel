@@ -3,16 +3,16 @@ import { getEntry, render } from 'astro:content';
 import { Image } from 'astro:assets';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { renderInline } from '@/lib/inline-markdown';
-// Julius's pick over the apparatus for the hero; the header and footer marks
-// stay on the apparatus. The largest thing above the fold, so eager and high
+// The press and loom, recoloured onto the palette (contentious-recolour,
+// 11 September); the header and footer marks stay on the apparatus. The largest thing above the fold, so eager and high
 // priority. width is the slot's upper bound with the breakout (ledger 24):
 // the constrained layout derives srcset and sizes from it.
-import heroArt from '@/assets/com-2.png';
+import heroArt from '@/assets/press-and-loom.png';
 
 const home = await getEntry('pages', 'home');
 if (!home) throw new Error('src/content/pages/home.mdx is missing');
 const { Content } = await render(home);
-const { eyebrow, heading, intro, cta } = home.data;
+const { eyebrow, heading, intro, cta, heroAlt = '' } = home.data;
 const introHtml = intro ? await renderInline(intro) : undefined;
 ---
 <BaseLayout
@@ -40,7 +40,7 @@ const introHtml = intro ? await renderInline(intro) : undefined;
         )}
       </div>
       <div class="c-hero__art">
-        <Image src={heroArt} alt="" width={800} loading="eager" fetchpriority="high" />
+        <Image src={heroArt} alt={heroAlt} width={800} loading="eager" fetchpriority="high" />
       </div>
     </div>
   </section>
