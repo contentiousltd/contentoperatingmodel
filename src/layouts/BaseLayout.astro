@@ -14,6 +14,7 @@ import { datesForPath } from '@/lib/lastmod.mjs';
 // the fold; italic and bold load on demand.
 import belyDisplayUrl from '@contentious/ui/fonts/BelyDisplay-Regular.woff2?url';
 import belyRegularUrl from '@contentious/ui/fonts/Bely-Regular.woff2?url';
+import historyOnTap from '@/client/history-on-tap.js?raw';
 
 interface Props {
   title: string;
@@ -76,7 +77,10 @@ const structuredData = buildJsonLd(site.href, nodes);
   {/* Client-side navigation with the browser's View Transitions API: the
       router fetches the next page, swaps the document and animates the
       change. Bundled scripts run once per session under it, so anything that
-      wires up page elements listens for astro:page-load (see Header.astro). */}
+      wires up page elements listens for astro:page-load (see Header.astro).
+      The inline script before it keeps Back working in Chrome and Edge on
+      an iPhone (src/client/history-on-tap.js says how). */}
+  <script is:inline set:html={historyOnTap} />
   <ClientRouter />
   <title>{pageTitle}</title>
   <meta name="description" content={description} />
