@@ -38,9 +38,9 @@ export default defineConfig({
     // contentious-astro, where its reasoning and measurements live): Astro
     // has no top-level format or quality option, so the service fills in the
     // defaults. Quality 65 by default; QUALITY.illustration (50) is opted in
-    // per call site for the hero and the apparatus figure, which hold up at
-    // it. The map keeps 65: it is finely drawn, and at 50 it lost 2 dB
-    // against WebP. Measured on 11 November 2026: see CHANGELOG.md.
+    // per call site only where it holds up against WebP, which today is the
+    // apparatus figure. The hero and the map keep 65: at 50 they lost 1.6 and
+    // 2 dB against WebP. Measured on 11 November 2026: see CHANGELOG.md.
     service: {
       entrypoint: './src/lib/image-service.ts',
     },
