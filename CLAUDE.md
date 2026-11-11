@@ -4,6 +4,12 @@
 
 `contentoperatingmodel.com`: the public home of the Content Operating Model framework. Today it is a publication, an Astro static site on Netlify. Later it grows a hosted component library and a blueprint generator, at which point it grows a server. See [docs/adr/adr-com-0001-repo-scope.md](docs/adr/adr-com-0001-repo-scope.md) for the boundary and [docs/plans/project-setup.md](docs/plans/project-setup.md) for how it was set up and why.
 
+## What the COM is (read before writing a word about it)
+
+**The Content Operating Model is machinery, not content.** None of its three layers is published content, and none of them is "what the audience sees". The essence layer and the knowledge and opinion layer are the foundations, owned by the whole organisation. The **content layer is the working machinery** on top of them: the answers to seven questions any content function has to answer about itself (why, what, where, when, for whom, by whom, how), across humans, agents and the handoffs between them. The pages, posts and emails an organisation publishes are what the machinery *produces*. They are not a layer, and the content layer is categorically not "the content".
+
+The source is the **COM: Working reference** in Notion (under the Content Operating Model product page). Describe the model in its words. Never paraphrase a layer into something new, and when a summary, a sentence or a diagram label disagrees with the reference, the reference wins. This was got badly wrong once: from the 7 September scaffold until 11 November the content layer's summary in `framework.ts` read "What the organisation publishes: the pages, posts, guides and emails…", the framework page said "Content is the only layer the audience sees", and a copy rewrite kept both.
+
 ## Suite architecture (read before any cross-product work)
 
 COM is one product in the **Contentious family**. Decisions about anything that spans products – **identity, organisations, membership, entitlement and billing across products, auth realms, the design system** – are owned at the **suite level, not here**. Their source of truth is the meta-repo:
