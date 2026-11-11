@@ -74,8 +74,11 @@
   /* THE LAYER STACK, as guidelines/pattern-com-page.html draws it: page
      markup, not a component, until it appears on a third page. Three cards,
      the top one on --surface-card-deep because the content layer is a
-     different kind of thing from the two foundations under it. Values are
-     the reference page's own. */
+     different kind of thing from the two foundations under it, and the
+     seven questions inside it as the reference's .qs grid. The reference
+     draws it on the front ground: on the tint the deep card measured
+     #CCCCC3 on a #CCCCC3 band and vanished. Values are the reference page's
+     own. */
   .stack {
     display: grid;
     gap: calc(var(--u) * 0.67);
@@ -88,12 +91,29 @@
     padding: calc(var(--u) * 1.11) calc(var(--u) * 1.22);
   }
 
+  .layer h3 {
+    font-family: var(--font-heading-display);
+    font-weight: 400;
+    font-size: var(--t-row);
+    color: var(--text-strong);
+    margin: 0;
+  }
+
+  /* Not the eyebrow, which is a <p> too: a bare .layer p outranks
+     .c-eyebrow and put the label at body size in the body colour. */
+  .layer p:not(.c-eyebrow) {
+    margin: calc(var(--u) * 0.22) 0 0;
+    font-size: var(--t-body-app);
+    line-height: 1.55;
+    color: var(--text-secondary);
+  }
+
   .layer--top {
     background: var(--surface-card-deep);
   }
 
   .layer--top h3,
-  .layer--top p {
+  .layer--top p:not(.c-eyebrow) {
     color: var(--text-strong);
   }
 
@@ -101,40 +121,51 @@
     color: var(--accent-link-on-deep);
   }
 
-}
-
-/* The stack's heading and copy sit inside .prose, whose h3 and p rules are
-   unlayered in the package, so these are unlayered too or they lose
-   regardless of source order. Values are the reference page's. */
-.prose .layer h3 {
-  font-family: var(--font-heading-display);
-  font-weight: 400;
-  font-size: var(--t-row);
-  color: var(--text-strong);
-  margin: 0;
-}
-
-.prose .layer p {
-  margin: calc(var(--u) * 0.22) 0 0;
-  font-size: var(--t-body-app);
-  line-height: 1.55;
-  color: var(--text-secondary);
-}
-
-@layer components {
-  /* The questions and the vocabulary: definition lists, one entry per
-     question or term, the term in the display face. The reset zeroes dl and
-     dd margins, so the rhythm is set here in --u. */
-  .questions > div,
-  .vocabulary > div {
-    margin-block: var(--u);
+  .qs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14ch, 1fr));
+    gap: calc(var(--u) * 0.67);
+    margin-top: var(--u);
   }
 
-  .questions dt,
-  .vocabulary dt {
+  .q {
+    border-top: 1px solid var(--rule-on-deep);
+    padding-top: calc(var(--u) * 0.44);
+  }
+
+  .q b {
+    display: block;
+    font-family: var(--font-heading-display);
+    font-weight: 400;
     font-size: var(--t-row);
     color: var(--text-strong);
   }
+
+  .q span {
+    font-size: var(--t-hint);
+    line-height: 1.45;
+    color: var(--text-secondary);
+  }
+}
+
+/* The stack sits inside .c-reading, whose h3, p and b rules are unlayered
+   (the package's ADR-UI-0007) and so beat every rule above however specific.
+   revert-layer hands each property they set back to the layered cascade,
+   where the reference's values are, so the stack's rules are written once. */
+.c-reading .stack :is(h3, p, b) {
+  font-family: revert-layer;
+  font-weight: revert-layer;
+  font-size: revert-layer;
+  line-height: revert-layer;
+  color: revert-layer;
+  margin: revert-layer;
+  text-wrap: revert-layer;
+}
+
+@layer components {
+  /* The questions and the vocabulary are definition lists; their styling
+     is a term-list pattern the system does not have yet, so it is ledger 34
+     in overrides.css. */
 
   /* The rule and call grid: a plain table until the design round supplies
      the 7×2 specimen (docs/plans/project-setup.md, Phase 0). Hairlines, not

@@ -107,6 +107,18 @@ and closing its items is ROAD-1368 (Next). The policy is
    one of them is wrong.
    **Decision needed:** COM's density, in `tokens/products.css` where the
    signature block records it, not in a product override.
+   11 November 2026, with v0.15.0's `.c-reading`: the package's
+   `--reading-size` is a third density token, a fixed 24px (0.9× under
+   32rem), and the framework page's prose now sits in the wrapper. Left at
+   24px it would have put the prose at 21.6 / 24 / 24px (phone / laptop /
+   wide) beside data blocks, ledes and headings on `--u` at 18 / 22 / 24px,
+   two scales on one page again (item 27), with the lede (`--t-lede`, 24.2px
+   at 1440) no bigger than the text under it. So it follows the density:
+   `--marketing-font-size × --text-multiplier` on `:root`, and the bare
+   20px at the phone step because `reading.css` applies its own 0.9 there.
+   Measured after: prose 18 / 22 / 24px at 400 / 1440 / 2192, unchanged.
+   The token's own comment says a product overrides it on `:root` in its
+   theme, which is what this is until the signature block takes it.
 
 9. **Nav links given a type role.** Bare `<a>`s in `.c-topbar__right` sat at
    the body's 17.6px at every width. Now `--t-ui`, the brand's size, so the
@@ -178,6 +190,12 @@ and closing its items is ROAD-1368 (Next). The policy is
     **Decision needed:** which face and size `.prose` headings take across
     the suite; `--font-size-h2` and `.type-h2` and `--t-title` are three
     answers to one question.
+    11 November 2026: answered for the framework page, which now sits in
+    v0.15.0's `.c-reading` (Bely Display regular h2 at 1.75em, Bely bold h3
+    at 1.15em; measured h2 57.6 → 42px and the "Terms deliberately not
+    used" h3 30px display → 27.6px bold at 2192). The block stays for the
+    `.prose` sections still on the home, toolkit, changelog and 404 pages;
+    it goes when they move to the wrapper too.
 
 14. **`.c-button` text vanishes on hover.** Measured: rest `--text-on-accent`
     (limestone-100) on sapling-700; hover `rgb(52,66,48)` (sapling-750, the
@@ -365,6 +383,22 @@ and closing its items is ROAD-1368 (Next). The policy is
     **Fix in the system:** `body` derives from the density tokens
     (`--t-body`, or `--u`), and `.prose` stops needing its own anchor.
     Optimisation audit §1.2 and §7.1.
+    11 November 2026: the same two collisions inside `.c-reading`, which
+    the framework page moved onto. Its `p` rule is unlayered (the package's
+    ADR-UI-0007) and reaches every eyebrow, and its h2 and h3 open with a
+    1.5em top margin. `.c-reading .c-eyebrow` hands size, line height,
+    colour and margin back to the layered `.c-eyebrow` with `revert-layer`
+    rather than restating them, and `.c-reading .c-eyebrow + h2` takes no
+    top margin. The layer stack's own h3, p and b do the same in
+    `site.css`. Measured before, at 400 / 1440 / 2192: the stack's card
+    eyebrows 18 / 22 / 24px in `--text-secondary` (rgb 79 77 75), the
+    content card's included, because `.prose .layer p` outranked
+    `.c-eyebrow`. After: 11.2 / 13.6 / 14.9px (`--t-label`), sapling-650 on
+    the foundations (item 28) and `--accent-link-on-deep` (rgb 52 66 48) on
+    the deep card, 0.33u under each.
+    **For the system:** `.c-reading` says it styles article text and
+    nothing else, but an eyebrow is a `<p>` and every Contentious section
+    opens with one. The wrapper should leave `.c-eyebrow` alone.
 
 27. **One type scale.** The package ships two: the em-based `type-h1 / h2 /
     h3 / intro / sm` and `--font-size-h*`, anchored to whatever the element
@@ -533,6 +567,28 @@ and closing its items is ROAD-1368 (Next). The policy is
     at once while the rest of the page crossfades.
     **Decision needed:** the marketing nav variant's current-page mark
     (item 25): ltd's underline, now here too, or something else.
+
+34. **The questions and the vocabulary as term lists.** The system has no
+    term-and-definition pattern, and the two `<dl>`s on `/framework` read
+    flat. Measured before, at 400 / 1440 / 2192: terms 18.9 / 23.1 / 25.2px
+    (`--t-row`, Bely Display) over definitions 18 / 22 / 24px in
+    `--text-body`, a step from the term's `--text-strong` that barely
+    shows; 0px between a term and its definition; 18 / 22 / 24px between
+    entries, so a definition sat as close to the next term as to its own.
+    The hierarchy now comes from three values the system already uses: the
+    definition in `--text-secondary`, as the layer card's description; the
+    pair 0.22u apart, as the card's title over its description; the entries
+    1.5u apart, the reading wrapper's heading rhythm and this page's stack
+    and grid margins. After: definitions in rgb 79 77 75, 4 / 5 / 5px under
+    the term, entries 27 / 33 / 36px apart. The rules moved from `site.css`
+    into one ledgered block in `overrides.css`, so the whole pattern goes
+    when the system answers. Raised for `contentious-ui`'s `GAPS.md` in the
+    PR that made the change.
+    **Decision needed:** a term-list pattern: the term's face and weight
+    beside `.c-reading`'s h3 (the "Terms deliberately not used" h3, Bely bold
+    at 27.6px, now reads quieter than the Bely Display terms at 25.2px under
+    it), the definition's colour, the two spacings, and whether entries
+    take a `--rule-row` hairline as the rule and call grid does.
 
 ## Removed, on Julius's call
 

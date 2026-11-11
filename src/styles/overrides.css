@@ -23,10 +23,14 @@
    density is one number derived from deployment mode, not two. Unlayered so
    it beats the theme. The gutter and column are the family's, declared once
    here so the container (ledger 4), the breakout (ledger 24) and the menu
-   (ledger 20) all read the same value. */
+   (ledger 20) all read the same value. --reading-size, the body of
+   .c-reading, is the same density a third time, so it follows: the
+   marketing unit at every step, and at the phone step the bare 20px,
+   because reading.css applies its own ×0.9 there (18px, as --u). */
 :root {
   --base-font-size: 20px;
   --marketing-font-size: 20px;
+  --reading-size: calc(var(--marketing-font-size) * var(--text-multiplier));
   --gutter: calc(var(--u) * 2.22);
   --column: var(--container-max-width);
 }
@@ -38,6 +42,7 @@
 @media (width <= 32rem) {
   :root {
     --text-multiplier: 0.9;
+    --reading-size: var(--marketing-font-size);
   }
 }
 
@@ -73,6 +78,26 @@
    heading it labels. The eyebrow's own margin is the gap. */
 .prose .c-eyebrow + h2,
 .prose .c-eyebrow + h3 {
+  margin-top: 0;
+}
+
+/* ledger 26: the same two collisions inside .c-reading, the framework page's
+   wrapper. Its p rule is unlayered (the package's ADR-UI-0007) and reaches
+   the eyebrow: measured 24px in the body colour with a 1.2em margin, where
+   the system's .c-eyebrow is --t-label in the accent. revert-layer hands the
+   four properties back to .c-eyebrow and its layered colour rules (ledger
+   28, the deep card's --accent-link-on-deep) rather than restating them.
+   And its h2 and h3 open with a 1.5em top margin, so the eyebrow's own
+   margin is the gap here too. */
+.c-reading .c-eyebrow {
+  font-size: revert-layer;
+  line-height: revert-layer;
+  color: revert-layer;
+  margin: revert-layer;
+}
+
+.c-reading .c-eyebrow + h2,
+.c-reading .c-eyebrow + h3 {
   margin-top: 0;
 }
 
@@ -793,5 +818,41 @@ body {
        content box object-fit: cover then crops to and clipping the mark
        left and right against its own frame. */
     margin-right: var(--u);
+  }
+}
+
+/* ---- The term list ---------------------------------------------------- */
+
+@layer components {
+  /* ledger 34: the questions and the vocabulary, as term lists. The system
+     has no term-and-definition pattern, and the plain <dl> read flat:
+     measured at 2192px a 25.2px term on a 24px definition in nearly the
+     same colour, 0px between them and 24px between entries. The hierarchy
+     now comes from three system values: the term at --t-row in the display
+     face over the definition in --text-secondary, the pair 0.22u apart as
+     the layer card's title over its description, and the entries 1.5u
+     apart, the reading wrapper's own heading rhythm and the stack's and the
+     grid's margin on this page. The reset zeroes dl and dd margins, so the
+     rhythm is all here. */
+  .questions > div,
+  .vocabulary > div {
+    margin-block: var(--u);
+  }
+
+  .questions > div + div,
+  .vocabulary > div + div {
+    margin-top: calc(var(--u) * 1.5);
+  }
+
+  .questions dt,
+  .vocabulary dt {
+    font-size: var(--t-row);
+    color: var(--text-strong);
+  }
+
+  .questions dd,
+  .vocabulary dd {
+    margin-top: calc(var(--u) * 0.22);
+    color: var(--text-secondary);
   }
 }

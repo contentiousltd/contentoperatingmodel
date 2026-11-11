@@ -12,6 +12,11 @@
    it every token falls back to Content Health Check's, which is the bug
    the product-signature layer exists to prevent.
 
+   reading.css is the long-form wrapper, .c-reading, which the framework
+   page's prose sits in (src/components/mdx/Band.astro). It is unlayered
+   by design (the package's ADR-UI-0007), so it goes before this site's
+   files: site.css and overrides.css meet it at the same level.
+
    Then two files of this site's own, split by fate (ADR-COM-0005):
    site.css is the site's own layout, which stays; overrides.css is
    every rule the design system should have supplied, each block tagged
@@ -28,6 +33,7 @@
 @import "@contentious/ui/styles/products.css";
 @import "@contentious/ui/styles/typography.css";
 @import "@contentious/ui/styles/components.css";
+@import "@contentious/ui/styles/reading.css";
 
 @import "./site.css";
 @import "./overrides.css";

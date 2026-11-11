@@ -4,9 +4,11 @@
  * markup, not a component, until it appears on a third page. Reads top-down
  * on the page and bottom-up in the model, so LAYERS (bottom first) is reversed
  * here. The content layer is the deep card because it is a different kind of
- * thing from the two foundations, not because it matters more.
+ * thing from the two foundations, not because it matters more, and it carries
+ * the seven questions as the reference's .qs grid: each question's name over
+ * its subtitle.
  */
-import { LAYERS } from '@/data/framework';
+import { LAYERS, QUESTIONS } from '@/data/framework';
 const stack = [...LAYERS].reverse();
 ---
 <div class="stack">
@@ -15,6 +17,13 @@ const stack = [...LAYERS].reverse();
       <p class="c-eyebrow">{layer.foundation ? 'Foundation' : 'The working machinery'}</p>
       <h3 id={layer.id}>{layer.name}</h3>
       <p>{layer.summary}</p>
+      {!layer.foundation && (
+        <div class="qs">
+          {QUESTIONS.map((question) => (
+            <div class="q"><b>{question.name}</b><span>{question.subtitle}</span></div>
+          ))}
+        </div>
+      )}
     </div>
   ))}
 </div>
