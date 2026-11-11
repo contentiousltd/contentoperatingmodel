@@ -1,0 +1,20 @@
+---
+import { QUESTIONS, REGISTERS } from '@/data/framework';
+---
+<table class="grid">
+  <thead>
+    <tr>
+      <th scope="col">Question</th>
+      {REGISTERS.map((register) => <th scope="col">{register.name}</th>)}
+    </tr>
+  </thead>
+  <tbody>
+    {QUESTIONS.map((question) => (
+      <tr>
+        <th scope="row">{question.name}</th>
+        <td>{question.rule}</td>
+        <td>{question.call}</td>
+      </tr>
+    ))}
+  </tbody>
+</table>

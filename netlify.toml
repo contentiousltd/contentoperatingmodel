@@ -7,8 +7,10 @@
 #
 # ADR-COM-0002 keeps a named list of everything Netlify-specific in this repo,
 # so the move to Railway stays a checklist rather than an excavation. This file,
-# the edge function and deploy previews are that list. There are deliberately
-# no Netlify Functions and no Netlify Forms.
+# the edge function, the headers below and deploy previews are that list. There
+# are deliberately no Netlify Functions and no Netlify Forms.
+#
+# Node version comes from .nvmrc, which Netlify reads; it is not repeated here.
 
 [build]
   command = "npm run build"
@@ -20,8 +22,26 @@
   # blanket *.md, because src/content is markdown that IS build input.
   ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- . ':(exclude)docs' ':(exclude).claude' ':(exclude)README.md' ':(exclude)CHANGELOG.md' ':(exclude)CLAUDE.md'"
 
-[build.environment]
-  NODE_VERSION = "22"
-
 [build.processing.html]
   pretty_urls = false
+
+# Netlify's default is Cache-Control: public, max-age=0, must-revalidate for
+# every file, which costs a round trip per asset per navigation. Astro hashes
+# everything under /_astro/ (CSS, fonts, images), so those are safe to cache
+# for a year. HTML and the machine door stay on the default so a deploy is
+# visible immediately. On Railway this is one res.set in Express.
+[[headers]]
+  for = "/_astro/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Baseline security headers. No CSP yet: the site runs one inline module
+# script and one inline JSON-LD block, both of which a CSP would need nonces
+# or hashes for, and that is a decision for when there is something to protect.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    X-Frame-Options = "SAMEORIGIN"

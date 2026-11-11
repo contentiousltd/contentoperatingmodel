@@ -301,8 +301,8 @@ Recorded 2026-09-07, after the scaffold landed.
 **Next in this repo**
 
 - The toolkit journey pages, as their drafts land: Transforming, Concepts to borrow, Diagnosis, Design.
-- The framework page's two distinctive pieces: the three-layer stack as the reference page draws it, and the fourteen cells as a real table rather than the plain one there now.
-- An OG image. `public/images/og-default.png` is referenced by every page and does not exist yet.
+- ~~The three-layer stack as the reference page draws it~~ (done in the optimisation audit, 7 September). The fourteen cells are still a plain table with hairlines; the 7×2 specimen from the design round is what replaces it.
+- ~~An OG image~~ (a placeholder exists; the designed share card is ledger item 23).
 - The v0 toolkit's components, into `src/content/components/`, which is why that collection's schema exists already.
 
 **Next elsewhere**

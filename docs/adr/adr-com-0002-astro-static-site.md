@@ -28,6 +28,7 @@ Against that, the app is coming. The hosted library (ROAD-1347), the generator (
 | --- | --- |
 | `netlify.toml` build config and docs-only skip | `railway.json` and watch paths |
 | `netlify/edge-functions/strip-trailing-slash.js` | Ten lines of Express middleware |
+| `[[headers]]` in `netlify.toml`: immutable caching for `/_astro/*`, baseline security headers | One `res.set` per header in Express, or `helmet` |
 | Deploy previews | Railway PR environments |
 
 **No Netlify Functions and no Netlify Forms.** Forms in particular: the free plan's submission allowance is small and shared across every site on the account, and the toolkit download is the feature most likely to exceed it. Email capture posts to MailerLite, where the rest of the lists live, so the move never touches it.
@@ -56,3 +57,7 @@ Against that, the app is coming. The hosted library (ROAD-1347), the generator (
 - **The React SPA shape from day one (Content Maturity's).** Rejected. Its costs fall on every public page for the life of the product, while the auth seam it avoids is paid once. It would also make the machine door harder, not easier: the source would be React components, so the Markdown renderings become a second artefact to keep in sync rather than a rendering of the source.
 - **Railway from day one.** Genuinely close, and no worse on the machine door, since Astro's prerendered output is identical either way. Rejected on simplicity for now, with the move sized above so the decision stays cheap to revisit. If the Netlify account needs a paid plan anyway, this becomes the better answer and the trigger in §6 fires.
 - **Netlify for the pages plus a Railway app on a subdomain.** The family's existing pattern and the likely end state. Rejected as a starting point: two deploy targets for one product before there is an app to deploy.
+
+## Amendment, 7 September 2026
+
+The named list in §5 gains one row: the `[[headers]]` blocks in `netlify.toml`. Netlify's default `Cache-Control` is `public, max-age=0, must-revalidate` for every file, so without them every hashed asset under `/_astro/` cost a round trip per navigation; the optimisation audit (`docs/optimisations-2026-09-07.md` §1.7) found the ledger had assumed otherwise. The baseline security headers ride in the same block. Both are one line each in Express when the move happens. `NODE_VERSION` was removed from the same file: Netlify reads `.nvmrc`, so it was the version typed twice.

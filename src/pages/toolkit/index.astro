@@ -1,35 +1,27 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import { CELLS } from '../../data/framework';
+import { getEntry, render } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import AccentList from '@/components/mdx/AccentList.astro';
 
-// The four journey pages arrive as their drafts land (Phase 2 in
-// docs/plans/project-setup.md). This page ships now because the framework page
-// links to it and a link to nothing is worse than a short page.
+const page = await getEntry('pages', 'toolkit');
+if (!page) throw new Error('src/content/pages/toolkit.mdx is missing');
+const { Content } = await render(page);
+const { eyebrow, heading, intro } = page.data;
 ---
 <BaseLayout
-  title="The toolkit"
-  description="Building a content operating model: what changes, what to borrow from devops, where you are now, and what to design. In development, arriving with version 1.0."
+  title={page.data.title}
+  metaTitle={page.data.metaTitle}
+  description={page.data.description}
   markdownTwin="/toolkit.md"
+  article
 >
-  <section class="c-marketing c-marketing-section">
+  <section class="c-marketing c-marketing-section prose">
     <div class="c-section__inner">
-      <p class="c-eyebrow">The toolkit</p>
-      <h1 class="display-heading type-h1">Helping you build one</h1>
-      <p class="type-intro">
-        The framework says what a content operating model needs to have. The
-        toolkit is about building yours, and it is being written now.
-      </p>
-      <ul class="c-bullets c-bullets--accent">
-        <li><strong>Transforming.</strong> Why this is a change project more than an editorial one, and the roles and skills an organisation may need more and less of.</li>
-        <li><strong>Concepts to borrow.</strong> What content functions can take from devops, and from the last round of digital transformation.</li>
-        <li><strong>Diagnosis.</strong> Where you are now, starting with five questions worth asking in a board meeting.</li>
-        <li><strong>Design.</strong> Given what you know, what to write down: a template for each of the {CELLS.length} cells.</li>
-      </ul>
-      <p>
-        Until then, <a href="/framework">the framework</a> is the specification,
-        and the <a href="https://contentmaturity.com">Content Maturity assessment</a>
-        measures the system that produces your content in about twenty minutes.
-      </p>
+      {eyebrow && <p class="c-eyebrow">{eyebrow}</p>}
+      <h1 class="page-title">{heading ?? page.data.title}</h1>
+      {intro && <p class="page-lede">{intro}</p>}
+      {/* Every list on this page is the design system's accent bullets. */}
+      <Content components={{ ul: AccentList }} />
     </div>
   </section>
 </BaseLayout>

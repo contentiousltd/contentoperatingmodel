@@ -1,0 +1,17 @@
+---
+import { VOCABULARY } from '@/data/framework';
+interface Props {
+  /** Render the terms deliberately not used instead of the vocabulary. */
+  rejected?: boolean;
+}
+const { rejected = false } = Astro.props;
+const terms = VOCABULARY.filter((term) => Boolean(term.rejected) === rejected);
+---
+<dl class="vocabulary">
+  {terms.map((term) => (
+    <div>
+      <dt class="display-heading">{term.term}</dt>
+      <dd>{term.definition}</dd>
+    </div>
+  ))}
+</dl>

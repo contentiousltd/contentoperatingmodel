@@ -1,0 +1,11 @@
+---
+import { QUESTIONS } from '@/data/framework';
+---
+<dl class="questions">
+  {QUESTIONS.map((question) => (
+    <div id={question.id}>
+      <dt class="display-heading">{question.name} <span class="questions__subtitle">{question.subtitle}</span></dt>
+      <dd>{question.summary}</dd>
+    </div>
+  ))}
+</dl>

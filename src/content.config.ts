@@ -1,4 +1,5 @@
-import { defineCollection, z } from 'astro:content';
+import { defineCollection } from 'astro:content';
+import { z } from 'astro/zod';
 import { glob } from 'astro/loaders';
 
 /**
@@ -25,6 +26,9 @@ const pages = defineCollection({
     intro: z.string().optional(),
     /** The hero's call to action. */
     cta: z.object({ label: z.string(), href: z.string() }).optional(),
+    /** The hero image's alt text, when the page has a hero image. Content,
+        so it lives here rather than in the page template. */
+    heroAlt: z.string().optional(),
     /** Ordering within the toolkit journey. Absent for standalone pages. */
     order: z.number().optional(),
     draft: z.boolean().default(false),
@@ -36,6 +40,10 @@ const pages = defineCollection({
  * one, deliberately – it is a collection so the page's prose is authored as
  * markdown beside src/data/framework.ts rather than inside a component, and
  * one entry because ADR-COM-0003 gives the framework a single canonical URL.
+ * It is MDX: the data-driven blocks (layers, questions, the grid, the
+ * vocabulary) are components rendering src/data/framework.ts, placed in the
+ * prose where they belong, so the page and its Markdown twin come from one
+ * file (docs/optimisations-2026-09-07.md §2.1).
  */
 const framework = defineCollection({
   loader: glob({ base: 'src/content/framework', pattern: '**/*.{md,mdx}' }),

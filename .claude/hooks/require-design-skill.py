@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""PreToolUse(Edit|Write|MultiEdit) design gate – refuse UI edits until the design
-system has actually been consulted.
+"""PreToolUse(Edit|Write|MultiEdit|Bash) design gate – refuse UI edits until the
+design system has actually been consulted.
 
 The failure this exists to stop: an agent writes UI without reading the design system,
 invents a colour/spacing/layout/component that looks plausible to it, and the result is
@@ -25,6 +25,15 @@ SKILL = "contentious-design"
 # UI files this gate covers. Server code, tests, config and docs are unaffected.
 UI_PATH = re.compile(r"/src/.*\.(astro|tsx|jsx|css)$")
 
+# The same files, named anywhere in a shell command that can write. In auto mode
+# the harness prefers Bash for edits (sed -i, heredocs, tee, cp, mv, python), so a
+# gate on the dedicated tools alone has a hole the width of the shell. Reads
+# (cat, grep, sed -n) are not matched: the write verb has to be present too.
+UI_PATH_IN_COMMAND = re.compile(r"(^|[\s'\"=])(\./)?src/[^\s'\"]*\.(astro|tsx|jsx|css)\b")
+WRITE_VERB = re.compile(
+    r"(\bsed\s+-[a-zA-Z]*i|>{1,2}\s*(\./)?src/|\btee\b|\bcp\b|\bmv\b|\bpython3?\b|\bnode\b|\bperl\b|<<-?\s*['\"]?EOF)"
+)
+
 DENIAL = f"""Design gate: invoke the `{SKILL}` skill before editing UI.
 
 This file is UI, and the design system has not been consulted in this session.
@@ -47,6 +56,13 @@ def is_ui_file(path: str) -> bool:
     if not path:
         return False
     return bool(UI_PATH.search(path.replace(os.sep, "/")))
+
+
+def is_ui_write_command(command: str) -> bool:
+    """A Bash command that names a UI file and carries a verb that could write it."""
+    if not command:
+        return False
+    return bool(UI_PATH_IN_COMMAND.search(command) and WRITE_VERB.search(command))
 
 
 def skill_was_invoked(transcript_path: str) -> bool:
@@ -94,10 +110,13 @@ def main() -> int:
         return 0  # unreadable input is never a reason to block work
 
     tool_input = payload.get("tool_input") or {}
-    path = tool_input.get("file_path") or tool_input.get("notebook_path") or ""
-
-    if not is_ui_file(path):
-        return 0
+    if payload.get("tool_name") == "Bash":
+        if not is_ui_write_command(tool_input.get("command") or ""):
+            return 0
+    else:
+        path = tool_input.get("file_path") or tool_input.get("notebook_path") or ""
+        if not is_ui_file(path):
+            return 0
 
     if skill_was_invoked(payload.get("transcript_path", "")):
         return 0

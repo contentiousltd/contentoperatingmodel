@@ -18,7 +18,18 @@
  * to enumerate, link to, or answer a question about.
  */
 
-/** A layer of the model. Ordered bottom (essence) to top (content). */
+/**
+ * A layer of the model. Ordered bottom (essence) to top (content).
+ *
+ * NONE OF THE THREE LAYERS IS PUBLISHED CONTENT, and none of them is "what the
+ * audience sees". The model is machinery. The content layer is the working
+ * machinery on top of the foundations: the answers to the seven questions
+ * (why, what, where, when, for whom, by whom, how) about how the content
+ * function operates. The pages, posts and emails an organisation publishes are
+ * what that machinery produces; they are not a layer of the model. Summaries
+ * here are taken from the Working reference's own wording, never paraphrased
+ * into something new. See "What the COM is" in CLAUDE.md.
+ */
 export interface Layer {
   id: string;
   name: string;
@@ -67,7 +78,7 @@ export const LAYERS: Layer[] = [
     id: 'essence',
     name: 'Essence',
     summary:
-      'Who the organisation is: its purpose, positions, values and voice. The layer that changes slowest and matters most.',
+      'Purpose, character and relationships: what the organisation is for, how it behaves and how it relates to the people it serves. The deepest layer and the slowest to change.',
     holds: ['Purpose', 'Character', 'Relationships'],
     foundation: true,
   },
@@ -75,7 +86,7 @@ export const LAYERS: Layer[] = [
     id: 'knowledge-and-opinion',
     name: 'Knowledge and opinion',
     summary:
-      'What the organisation knows and thinks: its expertise, evidence, data and arguments. The reason anyone should listen.',
+      'Frames, data and beliefs: how the organisation sees the world, what it knows and what it holds to be true. It shifts as the world does.',
     holds: ['Frames', 'Data', 'Beliefs'],
     foundation: true,
   },
@@ -83,7 +94,7 @@ export const LAYERS: Layer[] = [
     id: 'content',
     name: 'Content',
     summary:
-      'What the organisation publishes: the pages, posts, guides and emails that carry the other two layers out into the world.',
+      'The working machinery that sits on top of the foundations, organised around seven questions any content function has to answer about itself.',
     holds: ['The seven questions'],
     foundation: false,
   },
@@ -256,4 +267,23 @@ export const VOCABULARY: VocabularyEntry[] = [
     definition: 'Not used for the seven questions. Say questions.',
     rejected: true,
   },
+];
+
+/**
+ * The anchors the framework page promises to keep (ADR-COM-0004 §5). The
+ * section ids are hand-set in src/content/framework/framework.mdx; the layer
+ * and question ids come from the data above. scripts/postbuild-validate.mjs
+ * fails the build if any of them is missing from the built page, so a deep
+ * link into the specification cannot break by accident.
+ */
+export const ANCHORS: string[] = [
+  'a-way-is-not-a-model',
+  'the-three-layers',
+  'the-seven-questions',
+  'rule-and-call',
+  'vocabulary',
+  'terms-not-used',
+  'version',
+  ...LAYERS.map((layer) => layer.id),
+  ...QUESTIONS.map((question) => question.id),
 ];

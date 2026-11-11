@@ -24,11 +24,7 @@ jobs:
           # depth-1 clone does not have. Without this every lastmod is omitted
           # and the sitemap silently loses the field.
           fetch-depth: 0
-          # persist-credentials: false stops actions/checkout writing an
-          # AUTHORIZATION header for github.com into git config. If
-          # @contentious/ui ever goes private, that header would override the
-          # credentials a private-packages step configures. These jobs never
-          # push, so they do not need it.
+          # These jobs never push, so they don't need checkout's credentials.
           persist-credentials: false
 
       - uses: actions/setup-node@v4
@@ -36,17 +32,23 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
 
+      # @contentious/ui is private and installs from GitHub Packages; the
+      # committed .npmrc reads this read:packages token.
       - run: npm ci
+        env:
+          CONTENTIOUS_NPM_TOKEN: ${{ secrets.CONTENTIOUS_NPM_TOKEN }}
 
-      # Type-check, prose and tokens. check:tokens is the local stand-in for the
-      # token-copy detector suite ADR-0011 §5 promises the package will ship.
+      # Type-check, prose, tokens, the ledger and the design-system pin.
+      # check:tokens is the local stand-in for the token-copy detector suite
+      # ADR-0011 §5 promises the package will ship. check:ledger keeps
+      # src/styles/overrides.css and the deviations ledger in agreement
+      # (ADR-COM-0005). check:ui-current: the design system is pinned by exact
+      # tag (suite ADR-0014 §2); a consumer may be deliberately behind, never
+      # silently behind.
       - run: npm run lint
 
-      # The design system is pinned by exact tag (suite ADR-0014 §2). A
-      # consumer may be deliberately behind, never silently behind.
-      - run: npm run check:ui-current
-
       # Build runs the postbuild validator: every page needs a description, a
-      # canonical, JSON-LD, a Markdown twin and no trailing-slash internal
-      # links, and llms.txt, the sitemap, robots.txt and the feed must exist.
+      # correct canonical, JSON-LD, a Markdown twin whose headings match the
+      # page's, and no trailing-slash internal links; llms.txt must list every
+      # twin; the framework page must carry its version and every anchor.
       - run: npm run build

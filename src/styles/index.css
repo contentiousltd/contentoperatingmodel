@@ -11,6 +11,13 @@
    <html data-product="com"> is the whole theming integration. Without
    it every token falls back to Content Health Check's, which is the bug
    the product-signature layer exists to prevent.
+
+   Then two files of this site's own, split by fate (ADR-COM-0005):
+   site.css is the site's own layout, which stays; overrides.css is
+   every rule the design system should have supplied, each block tagged
+   with its ledger item and deleted when the system answers. Overrides
+   come last so they win any tie with the site's own rules.
+   npm run check:ledger keeps the tags and the ledger in agreement.
    ================================================================ */
 
 @import "@contentious/ui/styles/layers.css";
@@ -23,3 +30,4 @@
 @import "@contentious/ui/styles/components.css";
 
 @import "./site.css";
+@import "./overrides.css";

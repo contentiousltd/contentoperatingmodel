@@ -1,0 +1,101 @@
+---
+title: The content operating model
+metaTitle: The content operating model – an open framework from Contentious
+description: A written-down account of how your organisation decides, makes, maintains and retires content, in three layers, seven questions and two registers.
+---
+import Band from '@/components/mdx/Band.astro';
+import Layers from '@/components/framework/Layers.astro';
+import Questions from '@/components/framework/Questions.astro';
+import RuleAndCall from '@/components/framework/RuleAndCall.astro';
+import Vocabulary from '@/components/framework/Vocabulary.astro';
+import { CELLS, FRAMEWORK_VERSION } from '@/data/framework';
+
+{/* This file is the canonical page in one register. The data-driven blocks
+    are components rendering src/data/framework.ts; the prose between them is
+    the specification voice. Headings carry hand-set anchors ({#id}) so deep
+    links survive rewording (ADR-COM-0004 §5). The Markdown twin at
+    /framework.md is generated from this same file. */}
+
+<Band>
+
+Every organisation that publishes has a way of doing content. Few have written it down. A content operating model is the written-down version: how your organisation decides what to publish, makes it, keeps it current and retires it, along with the knowledge and beliefs all of that rests on.
+
+That used to be good practice. Now it's necessary, because AI agents can only follow what's written down. People pick up an organisation's habits over months of meetings and conversations in the kitchen. An agent can't. If your way of working lives only in people's heads, an agent has nothing to work from, and the next person you hire doesn't have much more.
+
+## A way of doing content isn't an operating model \{#a-way-is-not-a-model\}
+
+The way is usually easy to spot. A sign-off process adds four days to every page. New ideas get "we don't usually do that". One person knows why the pricing page is worded so carefully, and what happened in 2021 when it wasn't. Nobody designed any of this. It built up one decision at a time until it became how things are done.
+
+That isn't a model. A model exists outside the heads of the people who run it. A new starter can read it, a leadership team can argue with it and a team can change it on purpose. If the way your content gets made exists only as behaviour, what you have is a set of habits.
+
+Habits don't update themselves. That's how a rule to review everything once a year can sit in a slide deck and never be followed, and how 78 pages of health guidance can stay live after the policy behind them changed in the spring.
+
+So when someone asks "what's our AI strategy?", the useful answer is usually an operating model. AI won't decide how your content gets made, but it will only follow the decisions you've written down.
+
+</Band>
+
+<Band tint>
+
+<p class="c-eyebrow">The structure</p>
+
+## The three layers \{#the-three-layers\}
+
+The model has three layers. Two are foundations that belong to the whole organisation. The third, the content layer, is the working machinery that sits on top of them.
+
+<Layers />
+
+None of the three layers is what the audience sees. They see what the model produces: the pages, posts and emails. That output is where most organisations put their money and attention, while the machinery that makes it, and the foundations it should rest on, go unwritten. A lot of what looks like a writing problem starts there. The copy is competent; there just isn't a settled body of knowledge, a clear position or a working process behind it.
+
+</Band>
+
+<Band>
+
+<p class="c-eyebrow">The content layer</p>
+
+## The seven questions \{#the-seven-questions\}
+
+The content layer is organised around seven questions any content function has to answer about itself. Why sits at the centre. The other six depend on it, and none of them can be answered well until it has been.
+
+<Questions />
+
+</Band>
+
+<Band tint>
+
+<p class="c-eyebrow">Two registers</p>
+
+## Every question is answered twice \{#rule-and-call\}
+
+Each question needs two answers: a rule, decided once, and a call, made every time the question comes up. Most organisations are better at one than the other. An organisation strong on rules has a well-argued strategy that rarely shows up in the weekly work. One strong on calls has a smooth production line turning out content nobody can explain the purpose of.
+
+AI widens that gap, because it speeds up the calls and does nothing for the rules. Ask an agent to draft forty pages and it will make hundreds of calls before lunch. It can't tell you what those calls should be measured against.
+
+<RuleAndCall />
+
+Set the seven questions against the two registers and you get {CELLS.length} cells, each specific enough to write down and check. The 1.0 toolkit will include a template for every one.
+
+</Band>
+
+<Band>
+
+<p class="c-eyebrow">Vocabulary</p>
+
+## The words, and what they mean \{#vocabulary\}
+
+<Vocabulary />
+
+### Terms deliberately not used \{#terms-not-used\}
+
+<Vocabulary rejected />
+
+</Band>
+
+<Band tint>
+
+<p class="c-eyebrow">Versioning</p>
+
+## Version {FRAMEWORK_VERSION}, and what happens next \{#version\}
+
+The framework has a version number because it's still changing. Each release is logged in the [changelog](/changelog). We won't call it 1.0 until teams outside Contentious have used it on their own content.
+
+</Band>

@@ -8,8 +8,11 @@ usable front door, so from the topbar onward the fixes are local and recorded
 here. Each entry says what the system does, what this site does instead, and
 what Claude Design needs to decide.
 
-Where a fix lives: `src/styles/site.css` unless stated. Everything here is
-scoped to this product and goes when the system answers it.
+Where a fix lives: `src/styles/overrides.css` unless stated, in a block
+tagged with the item's number (`ledger 12`). `npm run check:ledger` fails the
+build if a block has no number or a number has no entry here, so this list
+and the CSS cannot drift (docs/optimisations-2026-09-07.md §4.4). Everything
+here is scoped to this product and goes when the system answers it.
 
 Roadmap: the work is ROAD-1367 (Done); taking this ledger to Claude Design
 and closing its items is ROAD-1368 (Next). The policy is
@@ -94,8 +97,14 @@ and closing its items is ROAD-1368 (Next). The policy is
    `:root` in `site.css`, unlayered so it beats the theme. Body 24px wide /
    22px laptop / 20px phone; hero title 58px; brand and nav 21px. For scale,
    contentious.ltd renders body copy at 36px and its h1 at 115px on the same
-   monitor. This repo's `CLAUDE.md` still says 24px and needs updating if
-   this stays.
+   monitor. This repo's `CLAUDE.md` now says 20px. Later the same day, a
+   phone step: the package's `--text-multiplier` runs 1 / 1.1 / 1.2 from
+   32rem up (`src/styles/typography.css`, library side), so phone and
+   laptop text differ by 10% at most; contentious.ltd carries `×0.9` below
+   32rem and the package's copy does not. `site.css` adds the same step,
+   unlayered. Body copy is then 18 / 20 / 22 / 24px from phone to wide.
+   **For the system:** the 0.9 step exists on ltd and not in the package;
+   one of them is wrong.
    **Decision needed:** COM's density, in `tokens/products.css` where the
    signature block records it, not in a product override.
 
@@ -121,8 +130,11 @@ and closing its items is ROAD-1368 (Next). The policy is
     `.c-hero { grid-template-columns: 1fr }` let the title's longest word
     ("organisations," at 61.6px, 431px) widen the page to 476px; `site.css`
     makes the track `minmax(0, 1fr)` below 52rem and hyphenates the title.
+    And the title's 3.08u held at every width put the phone heading at 62px
+    over eight lines; below 48rem it is now `--t-title` (2.4u).
     **For the system:** `.c-hero`'s single-column track should be
-    `minmax(0, 1fr)`; a 1fr track floors at the longest word.
+    `minmax(0, 1fr)`; a 1fr track floors at the longest word; and the hero
+    title wants a phone size, not one ratio.
     **Decision needed:** whether `.c-hero`'s own rhythm and title size are
     right, given a sibling front door already departs from them this far.
     Later the same day: the art column went from `1.1fr 1fr` to `1fr 1.25fr`
@@ -159,7 +171,10 @@ and closing its items is ROAD-1368 (Next). The policy is
     library's `--font-size-h2` (2.8em × step, 67px on a wide monitor, 0.91 of
     the 74px h1) to `--t-title` (2.4u, 57.6px, 0.78). For reference,
     contentious.ltd's h2 is 0.71 of its h1 and 2.5× body; Maturity Tool's is
-    0.8 and 2.95× body, using the system's `.type-h2`. h3 size untouched.
+    0.8 and 2.95× body, using the system's `.type-h2`. Later (optimisation
+    audit §1.2): h3 moved from the library's `--font-size-h3` (1.5em × step,
+    36px on a wide monitor) to `--t-section` (30px), so every prose heading
+    is on a role.
     **Decision needed:** which face and size `.prose` headings take across
     the suite; `--font-size-h2` and `.type-h2` and `--t-title` are three
     answers to one question.
@@ -207,6 +222,13 @@ and closing its items is ROAD-1368 (Next). The policy is
     it is the accent (the current `--accent-link` is 750, too dark for it).
     Timing made asymmetric on Julius's call: in over `--duration-slow`
     (500ms), out over 1.6s, the in-transition declared on the hover rule.
+    Text colour, also his call: body links in the accent itself, `--accent`
+    (sapling-700, 5.15:1 on the page ground), hover `--accent-hover`; the
+    system's `--accent-link` is sapling-750. On tinted sections sapling-700
+    measures 4.11:1 against limestone-750, so there links keep the system's
+    `--accent-link` (5.20:1) with `--accent-link-hover` on hover.
+    **For the system:** whether a product's text links take its accent
+    stop or the darker link stop, and the tint ground's contrast budget.
     **Decision needed:** the link hover as a system rule (motion, thickness,
     and whether ltd's 1.5s wants a token above glacial), and one mechanism —
     border or text-decoration — across the suite.
@@ -303,6 +325,215 @@ and closing its items is ROAD-1368 (Next). The policy is
     **Decision needed:** the product's share card, from Claude Design; this
     is a placeholder that stops the 404.
 
+24. **The hero art breaks out of the column at wide widths.** contentious.ltd
+    lets images run past the content column: a `.breakout` utility
+    (`width: 160%; margin-left: -30%`, reset below 768px) for centred
+    figures, and on its COM resource page a right-hand image overhanging the
+    column by a constant 275px from 1600px up. Julius asked for the same on
+    the hero. `site.css`: from 52rem, `.c-hero__art` takes a negative right
+    margin equal to the room between column and viewport minus the gutter,
+    capped at `0.2 × --container-max-width` (216px; an earlier draft of this
+    entry said 0.25, the CSS never did), so the art grows past the column as
+    the viewport allows and never causes a horizontal scroll. The prose
+    figure on the homepage takes the same breakout.
+    **Decision needed:** a breakout rule in the system (ltd has one, the
+    kit has none), and whether the front-door hero art overhangs as a rule.
+
+25. **The topbar wraps.** `.c-topbar` is `nowrap` because it was drawn at the
+    app's 19px; at the front door's size the brand plus links plus a button
+    overflow a narrow viewport. `flex-wrap: wrap` with a half-unit row gap,
+    the same patch the COM reference page's own stylesheet carries. Was
+    listed under "Seen, not changed" without a number; numbered so the CSS
+    can cite it.
+    **Decision needed:** the marketing nav variant the design round already
+    records as a requirement, and what collapses first at narrow widths.
+
+26. **Body text was 17.6px everywhere `.prose` and the roles did not
+    reach.** The package's `base.css` sets `body { font-size: 1.1rem }`,
+    which is 17.6px of the browser's 16px whatever `--base-font-size` says.
+    Measured on `/framework` before the fix: prose paragraphs 22 / 24px,
+    every paragraph, `dd` and `td` in the data sections 17.6px, the layer
+    stack's `h3` 17.6px (the same as body copy), all of `/toolkit` 17.6px.
+    Every "17.6px" in items 9, 10 and 17 is this one cause. Fixed here with
+    `.c-marketing-section { font-size: var(--t-body) }`, and, because the
+    package's `.prose` sets the unscaled base on the block and scales only
+    `p` and `li`, unlayered restatements of `.prose`, `.prose p`, `.prose li`
+    and `.prose .c-eyebrow` on the roles, and `.prose .c-eyebrow + h2` with
+    no top margin (the package's `.prose h2` 1.5em opened an 86px gap between
+    an eyebrow and the heading it labels). After: 24 / 22 / 18px body copy on
+    every page and element at wide / laptop / phone.
+    **Fix in the system:** `body` derives from the density tokens
+    (`--t-body`, or `--u`), and `.prose` stops needing its own anchor.
+    Optimisation audit §1.2 and §7.1.
+
+27. **One type scale.** The package ships two: the em-based `type-h1 / h2 /
+    h3 / intro / sm` and `--font-size-h*`, anchored to whatever the element
+    inherits (17.6px, item 26), and the role scale `--u` / `--t-*`, anchored
+    to density. This site used both and they disagreed on one page (prose h2
+    52.8px beside `type-h2` 54.2px at 1440). Now the roles only: `.page-title`
+    is every page's h1 at the hero title's size (item 10) so the front doors
+    match, `.page-lede` is `--t-lede` where `.type-intro` was 1.3em, `.meta`
+    is `--t-hint` where `.type-sm` was a fixed 14px, and no `type-*` class
+    remains in the markup. Breakpoints are written in range syntax
+    (`(width < 48rem)`); 48rem and 52rem are the system's chrome and hero
+    breakpoints and have no published token.
+    **Decision needed:** retire the `type-*` classes or redefine them on
+    `--t-*`; publish the breakpoints as named values. Optimisation audit
+    §4.1, §4.2 and §7.2, §7.7.
+
+28. **The eyebrow is sapling-650.** `.c-eyebrow` takes `--accent-link`,
+    which COM's signature sets to sapling-750 (6.50:1 on the page): at that
+    depth the label reads as near black and the green is lost. Julius asked
+    for sapling-650 so the eyebrow is noticeably green. Measured 4.05:1 on
+    limestone-600, which is under AA's 4.5:1 for small text; sapling-700 is
+    the nearest stop that passes (5.15:1). The deep-surface eyebrow in the
+    layer stack is unchanged (`--accent-link-on-deep`, 8 September).
+    **Decision needed:** whether the eyebrow gets its own token (an
+    `--accent-label`, say) lighter than the link colour, and at which stop,
+    given the contrast floor.
+
+29. **Footer text is limestone-750, and the mark gets more right-hand
+    space.** `[data-surface="inverse"]` sets `--text-body` to
+    limestone-400 (13.03:1 on the footer's gloaming-700 ground); Julius
+    asked for it dimmer, at limestone-750 (8.84:1, still well past AA's
+    4.5:1). `.footer-brand img` also takes a right margin of `1u`, on top
+    of the row's existing `1u` gap, so the mark sits further from the name
+    and description beside it. Originally a right padding: the base
+    reset's `box-sizing: border-box` let that padding eat into the mark's
+    own declared width, narrowing its square into a rectangle that
+    `object-fit: cover` then cropped left and right against. Margin
+    doesn't touch the content box, so it was the fix as well as the
+    intended spacing (item 31 below is the same defect in the header).
+    **Decision needed:** none; both are presentational calls with no
+    system gap behind them.
+
+30. **The mobile nav (item 20) is now a port of contentious.ltd's, value
+    for value, in COM's colours.** Julius asked for ltd's: the burger that
+    morphs, larger links, the hover fade, the tinted fill, text further
+    from white, and a fade rather than a flash on open. A first pass that
+    swapped in system tokens instead (`--accent-hover` as a hover pill,
+    `--text-inverse`, a 94% tint, a separate close button) was rejected as
+    ugly, and rightly: the brief was to copy what works. So every number is
+    ltd's bar the burger's. The fill at 97%; links fading to 0.8 on
+    `--marketing-transition-fast`; no current-page mark, because ltd has
+    none. The burger is a tenth under ltd's. ltd's, measured on the live
+    site, is 28 x 3px lines 6px apart at the top of the page, scaled to
+    0.85 on scroll; copied exactly it still read larger to Julius beside
+    ltd's, so COM's is 25 x 2.5px lines 5.5px apart, scaled the same way
+    (item 32).
+    The burger is drawn on the device-pixel grid, which ltd's is not.
+    Julius saw the three lines at three thicknesses in Chrome. Measured:
+    Chrome snaps every CSS box to whole CSS pixels before scaling, so
+    three identical 2.5px spans at fractional positions rendered 6, 4 and
+    4 device rows at 2x, and at any fractional scale (page zoom, a scaled
+    display) whole-pixel boxes land on different fractions of a device
+    pixel and anti-alias unevenly. SVG rects at fractional CSS coordinates
+    do the same. What does not: an inline SVG whose coordinate unit is one
+    device pixel, with the rects on integer coordinates. Crisp and
+    identical at 1x, 1.6x, 2x, 2.2x and 3.2x in headless Chrome. The
+    script in `Header.astro` sets the viewBox and rects from
+    `devicePixelRatio` (again on resize, which zoom fires); the markup
+    carries the 2x values for the frame before it runs. ltd's is even on
+    Julius's display by luck of its numbers, which is not a property worth
+    copying. The same script places the button: ink centred in the bar
+    with its 44px box 32px from the right edge, which puts the ink about
+    42px in, on the gutter. Julius set the 32 in devtools by eye once the
+    bar started at 81px (item 32); with the 58px bar, ink at 18px (equal
+    on three sides) sat too close, the gutter too far and 24px right. The whole control, burger and X alike, is at
+    opacity 0.7 on Julius's call so it reads quieter than the wordmark.
+    **For the system:** a burger/close control drawn this way, so no
+    product has to rediscover it. Colour is the only thing
+    mapped by role rather than copied: the fill is `--accent` where ltd's
+    is its band colour, and the text is `--surface-page` (limestone-600,
+    5.15:1 on sapling-700) where ltd's is its own page cream on sunshine.
+    Links are `--t-metric`, a size up from `--t-section` and still a named
+    role.
+    Two things in ltd's construction turned out to be load-bearing. The
+    toggle sits *outside* the sticky header as a fixed element, because the
+    header is a stacking context and nothing inside it can rise above the
+    overlay; the morph was invisible until the button moved. And the fade
+    is a class toggled a frame after opening. The old `<dialog>` used
+    `showModal()` and `@starting-style`: the top layer would cover the
+    button, and `@starting-style` never parsed as a rule in this cascade
+    (confirmed with CDP; the identical block worked on an isolated page),
+    which is why it flashed. Now `show()`, with Escape and focus handled in
+    the script. A bug fix, not a design question.
+    **Decision needed:** the system has no tinted-accent token for a
+    full-bleed overlay, so the fill is `color-mix(in srgb, var(--accent)
+    97%, transparent)`, ltd's percentage against the token rather than a
+    third number. Logged in `contentious-ui`'s `GAPS.md`, 9 September
+    2026. Separately, and not a deviation: three products (contentious.ltd,
+    contentmaturity.com, COM) now each carry their own copy of this same
+    nav with no shared component behind any of them, which item 25 already
+    flagged as open. Worth deciding whether it becomes one marketing
+    `MobileNav` in `@contentious/ui` before a fourth copy happens.
+
+31. **The header mark cropped top and bottom.** `.c-topbar__brand img` in
+    the package sets `height: 1.67u` and nothing else, so width fell back
+    to the `<Image>` component's fixed `width="40"` HTML attribute. `--u`
+    is not always 24px (the phone step is ×0.9, and the marketing base
+    itself is 20px here, ledger 8), so the box went wider or narrower than
+    tall while the source mark is square, and `object-fit: cover` cropped
+    the top and bottom to fill it. Set both axes off `--u` here, square at
+    every width, the same fix as the footer mark's (item 29).
+    **Decision needed:** the package's own rule should set both axes, or
+    neither and let the `<Image>` component's own width/height attributes
+    (which do track a real pixel size, just not `--u`) carry it alone.
+    Raised in `contentious-ui`'s `GAPS.md`.
+
+32. **The larger bar, kept throughout; the shrink on scroll tried and
+    dropped.** Julius asked for contentious.ltd's shrinking nav and chose
+    to start larger and settle on the bar as already tuned. It was built
+    on 9 September 2026 (a `--scroll` value from the header script, the
+    sizes as `calc()` on it, the burger scaling with it, and an eased
+    landing after a page transition, which needed a fixed bar, a
+    registered property and two Chrome quirks worked around) and then
+    dropped the same day: it buys back 23px on a phone and 28px on a
+    desktop once you are reading, and the eased landing never quite read
+    as smooth. The rest state is kept as the bar's one size: `1u` padding
+    over the system's `0.78u`, a `2.5u` mark over `1.67u` (ltd's 60px
+    monogram at the marketing base), the wordmark at `--t-lede` over
+    `--t-ui` from 48rem (it holds at `--t-ui` below, where it would wrap
+    beside the mark). The `<Image>` is requested at 64px so the 2x source
+    covers the mark, and it takes half a unit of right margin on top of
+    the brand's gap, on Julius's call (the footer mark takes a whole unit,
+    item 29). `scroll-padding-top` keeps anchor targets clear of the
+    sticky bar. The code and every measurement, ltd's included, are in
+    [docs/plans/shrinking-nav-2026-09-09.md](plans/shrinking-nav-2026-09-09.md)
+    for reinstating.
+    **Decision needed:** whether the marketing topbar variant (item 25)
+    is this size as a rule.
+
+33. **The desktop nav marks the current page with the underline and
+    hovers in colour, as contentious.ltd's does.** The nav carried no
+    current-page mark. A step in tone was tried first (links at
+    `--text-secondary`, the current page at `--text-strong`, hover lifting
+    to strong with the underline) and Julius judged it too quiet and
+    preferred ltd's pattern, which also keeps the family consistent. So
+    the sapling-500 underline the text links share (item 15) now denotes
+    the current page, persistent. The links rest on `--text-body` rather
+    than the package's link colour (sapling-750, near black, item 28), and
+    hover and focus fade them to sapling-650, the eyebrow's stop and the one
+    COM green that reads as green; at 21px large text it is well past
+    AA's 3:1. The
+    underline fades in over `--motion-overlay` (350ms, ease-out) and out
+    over `--duration-slow` (500ms), in fast and out slower as the text
+    links are, because it also travels (one 800ms both ways read as a
+    delayed fade in, one 350ms both ways as too quick an exit, and 800ms
+    out as a touch slow): the nav
+    carries `transition:persist` (it is identical on every page) and the
+    header script re-marks the current link at the swap, reading a computed
+    style first so the re-inserted links have something to transition
+    from. The nav also carries `transition:animate="none"`, which takes it
+    out of the page crossfade: the browser paints its snapshot of the old
+    page through the crossfade, which held the old underline solid so its
+    fade read as a vanish, and waiting for the crossfade to end before
+    moving it read as a delayed fade in. As its own group with no
+    animation, the live nav shows from the swap and both underlines move
+    at once while the rest of the page crossfades.
+    **Decision needed:** the marketing nav variant's current-page mark
+    (item 25): ltd's underline, now here too, or something else.
+
 ## Removed, on Julius's call
 
 - The tinted "The shape of it" section on the homepage (three layers, seven
@@ -312,7 +543,6 @@ and closing its items is ROAD-1368 (Next). The policy is
 
 ## Seen, not changed
 
-- **Marketing nav variant.** Still open in the system; `.c-topbar`'s
-  `flex-wrap` patch stays.
-- **Astro dev toolbar.** The dark pill at the foot of every dev page. Not in
-  the build; can be switched off in `astro.config.mjs` if it grates.
+- **Marketing nav variant.** Still open in the system; now item 25.
+- **Astro dev toolbar.** Switched off in `astro.config.mjs` (optimisation
+  audit §3.4).

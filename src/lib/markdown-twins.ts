@@ -4,19 +4,21 @@
  * One object, many renderings: the same source produces the HTML page, this
  * file and the entries in llms.txt. A twin is not a summary and not a second
  * document – it is the page, in the format a machine reads without parsing
- * layout (ADR-COM-0004).
+ * layout (ADR-COM-0004). Each page's twin is a transform of that page's own
+ * MDX source (src/lib/mdx-to-markdown.ts) plus whatever the page template adds
+ * around it (the hero's heading and intro, the version line), so nothing here
+ * is typed a second time.
  *
  * Each twin carries front matter naming the canonical HTML URL and, for the
  * framework, the version, so a copy of it that travels still says what it is
  * and what it is a copy of.
  */
 import { getCollection, getEntry } from 'astro:content';
-import {
-  FRAMEWORK_VERSION,
-  LAYERS,
-  QUESTIONS,
-  VOCABULARY,
-} from '../data/framework';
+import { PAGES, SITE_URL } from '@/config/site';
+import { CELLS, FRAMEWORK_VERSION } from '@/data/framework';
+import { mdxToMarkdown } from './mdx-to-markdown';
+import { layersMarkdown, questionsMarkdown, ruleAndCallMarkdown, vocabularyMarkdown } from './framework-markdown';
+import { latestRelease, releaseDate } from './releases';
 
 export interface Twin {
   /** Route of the twin itself, without the leading slash: "framework.md". */
@@ -31,46 +33,34 @@ export interface Twin {
 const frontMatter = (fields: Record<string, string>) =>
   ['---', ...Object.entries(fields).map(([k, v]) => `${k}: ${JSON.stringify(v)}`), '---'].join('\n');
 
-/** The framework's structured half, rendered as Markdown rather than HTML. */
-function frameworkTables(): string {
-  const layers = LAYERS.map(
-    (layer) => `### ${layer.name}\n\n${layer.summary}\n\nHolds: ${layer.holds.join(', ')}.`,
-  ).join('\n\n');
+/** The components and expressions the content files use, as Markdown. */
+const TWIN_OPTIONS = {
+  components: {
+    Layers: () => layersMarkdown(),
+    Questions: () => questionsMarkdown(),
+    RuleAndCall: () => ruleAndCallMarkdown(),
+    Vocabulary: (attrs: Record<string, unknown>) => vocabularyMarkdown(Boolean(attrs.rejected)),
+    // Decorative art, not content.
+    Image: (attrs: Record<string, unknown>) => (typeof attrs.alt === 'string' && attrs.alt.trim() ? `_${attrs.alt.trim()}_` : null),
+    // An eyebrow is a label for the eye; the heading under it says the same
+    // thing to a machine. Any other <p> is unwrapped to its text.
+    p: (attrs: Record<string, unknown>) => (/\bc-eyebrow\b/.test(String(attrs.class ?? '')) ? null : undefined),
+  },
+  expressions: {
+    'CELLS.length': String(CELLS.length),
+    FRAMEWORK_VERSION,
+  },
+};
 
-  const questions = QUESTIONS.map(
-    (q) => `### ${q.name} ${q.subtitle}\n\n${q.summary}${q.hub ? '\n\nThis is the hub: the other six connect to it.' : ''}`,
-  ).join('\n\n');
+let cached: Promise<Twin[]> | undefined;
 
-  const grid = [
-    '| Question | The rule, set once | The call, made every time |',
-    '| --- | --- | --- |',
-    ...QUESTIONS.map((q) => `| ${q.name} | ${q.rule} | ${q.call} |`),
-  ].join('\n');
-
-  const vocabulary = VOCABULARY.filter((t) => !t.rejected)
-    .map((t) => `- **${t.term}** – ${t.definition}`)
-    .join('\n');
-
-  const rejected = VOCABULARY.filter((t) => t.rejected)
-    .map((t) => `- **${t.term}** – ${t.definition}`)
-    .join('\n');
-
-  return [
-    '## The three layers',
-    layers,
-    '## The seven questions',
-    questions,
-    '## Every question is answered twice',
-    'A strategy sets the rule once; an operating model makes the call every time.',
-    grid,
-    '## Vocabulary',
-    vocabulary,
-    '### Terms deliberately not used',
-    rejected,
-  ].join('\n\n');
+/** Every twin. Computed once per build; three routes read it. */
+export function twins(siteUrl: string = SITE_URL): Promise<Twin[]> {
+  cached ??= build(siteUrl);
+  return cached;
 }
 
-export async function twins(siteUrl: string): Promise<Twin[]> {
+async function build(siteUrl: string): Promise<Twin[]> {
   const base = siteUrl.replace(/\/$/, '');
   const out: Twin[] = [];
 
@@ -82,22 +72,19 @@ export async function twins(siteUrl: string): Promise<Twin[]> {
       title: home.data.title,
       description: home.data.description,
       body: [
-        frontMatter({
-          title: home.data.title,
-          description: home.data.description,
-          canonical: `${base}/`,
-        }),
+        frontMatter({ title: home.data.title, description: home.data.description, canonical: `${base}/` }),
         '',
         `# ${home.data.heading ?? home.data.title}`,
         '',
-        ...(home.data.intro ? [home.data.intro, ''] : []),
-        home.body ?? '',
+        ...(home.data.intro ? [home.data.intro.trim(), ''] : []),
+        mdxToMarkdown(home.body ?? '', TWIN_OPTIONS),
       ].join('\n'),
     });
   }
 
   const framework = await getEntry('framework', 'framework');
   if (framework) {
+    const release = await latestRelease();
     out.push({
       path: 'framework.md',
       canonical: '/framework',
@@ -109,15 +96,32 @@ export async function twins(siteUrl: string): Promise<Twin[]> {
           description: framework.data.description,
           canonical: `${base}/framework`,
           version: FRAMEWORK_VERSION,
+          ...(release ? { released: release.data.date.toISOString().slice(0, 10) } : {}),
         }),
         '',
         `# ${framework.data.title}`,
         '',
-        `Version ${FRAMEWORK_VERSION}. An open framework from Contentious.`,
+        `Version ${FRAMEWORK_VERSION}${release ? ` · ${releaseDate(release)}` : ''} · an open framework from Contentious, being tested with real organisations before 1.0.`,
         '',
-        framework.body ?? '',
+        mdxToMarkdown(framework.body ?? '', TWIN_OPTIONS),
+      ].join('\n'),
+    });
+  }
+
+  const toolkit = await getEntry('pages', 'toolkit');
+  if (toolkit) {
+    out.push({
+      path: 'toolkit.md',
+      canonical: '/toolkit',
+      title: toolkit.data.title,
+      description: toolkit.data.description,
+      body: [
+        frontMatter({ title: toolkit.data.title, description: toolkit.data.description, canonical: `${base}/toolkit` }),
         '',
-        frameworkTables(),
+        `# ${toolkit.data.heading ?? toolkit.data.title}`,
+        '',
+        ...(toolkit.data.intro ? [toolkit.data.intro.trim(), ''] : []),
+        mdxToMarkdown(toolkit.body ?? '', TWIN_OPTIONS),
       ].join('\n'),
     });
   }
@@ -128,16 +132,18 @@ export async function twins(siteUrl: string): Promise<Twin[]> {
   out.push({
     path: 'changelog.md',
     canonical: '/changelog',
-    title: 'Changelog',
-    description: 'Every change to the Content Operating Model framework, release by release.',
+    title: PAGES.changelog.title,
+    description: PAGES.changelog.description(FRAMEWORK_VERSION),
     body: [
       frontMatter({
-        title: 'Changelog',
-        description: 'Every change to the Content Operating Model framework, release by release.',
+        title: PAGES.changelog.title,
+        description: PAGES.changelog.description(FRAMEWORK_VERSION),
         canonical: `${base}/changelog`,
       }),
       '',
-      '# Changelog',
+      `# ${PAGES.changelog.title}`,
+      '',
+      PAGES.changelog.intro,
       '',
       ...releases.flatMap((release) => [
         `## Version ${release.data.version}`,
@@ -146,26 +152,9 @@ export async function twins(siteUrl: string): Promise<Twin[]> {
         '',
         release.data.summary,
         '',
+        (release.body ?? '').trim(),
+        '',
       ]),
-    ].join('\n'),
-  });
-
-  out.push({
-    path: 'toolkit.md',
-    canonical: '/toolkit',
-    title: 'The toolkit',
-    description:
-      'Building a content operating model: what changes, what to borrow from devops, where you are now, and what to design.',
-    body: [
-      frontMatter({
-        title: 'The toolkit',
-        description: 'Building a content operating model.',
-        canonical: `${base}/toolkit`,
-      }),
-      '',
-      '# The toolkit',
-      '',
-      'In development, arriving with version 1.0. It covers transforming, concepts to borrow from devops, diagnosis, and design: a template for each of the fourteen cells.',
     ].join('\n'),
   });
 
